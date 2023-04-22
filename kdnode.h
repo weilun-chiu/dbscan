@@ -10,10 +10,10 @@ public:
     KDNodeptr left;
     KDNodeptr right;
     bool isLeaf;
-    std::vector<Point> points;
+    std::vector<int> points;
 
     // CTORs
-    KDNode() : pivot(Point()), left(nullptr), right(nullptr), isLeaf(false), points{std::vector<Point>()} {}
+    KDNode() : pivot(Point()), left(nullptr), right(nullptr), isLeaf(false), points{std::vector<int>()} {}
 
     // rm CPCTOR, assignment op
     KDNode(KDNode const& other)=delete;

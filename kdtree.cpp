@@ -19,23 +19,15 @@ void KDTree::buildTreeHelper(std::vector<Point> ps, std::shared_ptr<KDNode>& cur
 
     // Base case: if number of points is less than or equal to leafsize, create a leaf node
     if (num_points <= leafsize) {
-        curr_node->points = ps;
+        for (auto &p : ps)
+            curr_node->points.push_back(p.id);
         curr_node->isLeaf = true;
-        // for (auto &p : curr_node->points)
-        //     std::cout << p << std::endl;
-        // std::cout << "num_points in leaf: " << num_points << std::endl;
         return;
     }
 
     size_t axis = depth % Point::dimensionality;
     size_t median_index = num_points / 2;
     std::nth_element(ps.begin(), ps.begin() + median_index, ps.end(), [&](const Point& lhs, const Point& rhs) { return lhs[axis] < rhs[axis]; });
-    // for (int i=0; i < ps.size(); i++) {
-    //     if (i < median_index && ps[i][axis] > ps[median_index][axis])
-    //         std::cout << "Exception1" << std::endl;
-    //     if (i > median_index && ps[i][axis] < ps[median_index][axis])
-    //         std::cout << "Exception2" << std::endl;
-    // }
 
     curr_node->pivot = ps[median_index];
     curr_node->left = std::make_shared<KDNode>();
@@ -45,35 +37,27 @@ void KDTree::buildTreeHelper(std::vector<Point> ps, std::shared_ptr<KDNode>& cur
     buildTreeHelper(std::vector<Point>(ps.begin() + median_index, ps.end()), curr_node->right, depth + 1);
 }
 
-std::vector<Point> KDTree::search(const Point& target_point, const double eps) {
-    std::vector<Point> points;
-    // std::cout << "start_search " << target_point <<std::endl;
+std::vector<int> KDTree::search(const Point& target_point, const double eps) {
+    std::vector<int> points;
     searchHelper(root.get(), target_point, eps, points, 0);
     return points;
 }
 
-void KDTree::searchHelper(const KDNode* curr_node, const Point& target_point, const double eps, std::vector<Point>& points, const size_t depth) {
+void KDTree::searchHelper(const KDNode* curr_node, const Point& target_point, const double eps, std::vector<int>& points, const size_t depth) {
     if (curr_node == nullptr) {
         return;
     }
 
     if (curr_node->isLeaf) {
-        if (curr_node->points.size() > 0)
-            for (auto &p : curr_node->points) {   
-                if (dist(p, target_point) <= eps)
-                    points.push_back(p);
-            }
+        points.insert(points.end(), curr_node->points.begin(), curr_node->points.end());
         return;
     }
 
     size_t axis = depth % Point::dimensionality;
-    if (curr_node->left != nullptr) {
-
-    // && (target_point[axis] - eps <= curr_node->pivot[axis])) {
+    if (curr_node->left != nullptr && (target_point[axis] - eps <= curr_node->pivot[axis])) {
         searchHelper(curr_node->left.get(), target_point, eps, points, depth + 1);
     }
-    if (curr_node->right != nullptr) {
-        //  && (target_point[axis] + eps >= curr_node->pivot[axis])) {
+    if (curr_node->right != nullptr && (target_point[axis] + eps >= curr_node->pivot[axis])) {
         searchHelper(curr_node->right.get(), target_point, eps, points, depth + 1);
     }
 }

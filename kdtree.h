@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <vector>
@@ -14,12 +15,11 @@ public:
     KDTree(KDTree const& other)=delete;
     KDTree& operator=(KDTree const& other)=delete;
     // API
-    
-    std::vector<Point> search(const Point& target_point, const double distance);
+    std::vector<int> search(const Point& target_point, const double distance);
 private:
 
     std::shared_ptr<KDNode> root;
     size_t leafsize;
     void buildTreeHelper(std::vector<Point> points, std::shared_ptr<KDNode>& curr_node, const size_t depth);
-    void searchHelper(const KDNode* curr_node, const Point& target_point, const double distance, std::vector<Point>& points, const size_t depth);
+    void searchHelper(const KDNode* curr_node, const Point& target_point, const double distance, std::vector<int>& points, const size_t depth);
 };
