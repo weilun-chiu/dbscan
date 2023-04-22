@@ -5,7 +5,6 @@ This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clus
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Installation](#installation)
 - [Usage](#usage)
 - [Milestones](#milestones)
 - [Contributing](#contributing)
@@ -15,13 +14,10 @@ This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clus
 
 This project aims to provide an efficient and scalable implementation of DBSCAN in C++. It currently includes a naive approach and a grid-based approach, with plans to add parallelization and KDtree optimizations in future milestones.
 
-## Installation
-
-To install this project, you will need a C++ compiler and the Boost library installed on your machine. Once you have these dependencies installed, you can clone this repository and build the project using CMake.
-
 ## Usage
 
-To use this project, you can include the DBSCAN header file in your C++ project and call the `dbscan` function with your data as input. The output will be a vector of cluster labels for each point in your dataset.
+In order to utilize this project, you can add the DBSCAN header file to your C++ project and invoke the dbscan function, passing in your data as an input parameter. The outcome will be a collection of cluster labels for every point in your dataset, returned as a vector.
+The `main.cpp file serves as the primary example of usage, while the `test.cpp` file exhibits the results of the unit tests.
 
 ## Milestones
 
