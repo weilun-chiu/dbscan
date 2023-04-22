@@ -28,6 +28,12 @@ public:
     static void setDimension(size_t d) {dimensionality = d;}
 
     // Overloads
+    auto begin() const {
+        return coords.begin();
+    }
+    auto end() const {
+        return coords.end();
+    }
     size_t size() const {
         return coords.size();
     }
