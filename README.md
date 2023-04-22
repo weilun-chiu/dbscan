@@ -17,7 +17,7 @@ This project aims to provide an efficient and scalable implementation of DBSCAN 
 ## Usage
 
 In order to utilize this project, you can add the DBSCAN header file to your C++ project and invoke the dbscan function, passing in your data as an input parameter. The outcome will be a collection of cluster labels for every point in your dataset, returned as a vector.
-The `main.cpp file serves as the primary example of usage, while the `test.cpp` file exhibits the results of the unit tests.
+The `main.cpp` file serves as the primary example of usage, while the `test.cpp` file exhibits the results of the unit tests.
 
 ## Milestones
 
