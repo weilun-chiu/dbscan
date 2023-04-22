@@ -25,7 +25,7 @@ To make use of this project, you can add the DBSCAN header file #include "dbscan
 
 The `main.cpp` file serves as the primary example of usage, while the `test.cpp` file exhibits the results of the unit tests.
 
-```
+```C++
     // Data generations
     DataGenerator generator(2, 1000);
     auto cluster_data = generator.cluster_distribution(3);
