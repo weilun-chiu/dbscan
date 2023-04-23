@@ -60,15 +60,15 @@ Our initial attempt to parallelize the grid-based DBSCAN algorithm(n:50000, clus
 ```
 Samples: 347K of event 'cycles:u', Event count (approx.): 282010497999
 Overhead  Command  Shared Object        Symbol
-  29.23%  dbscan   libc-2.28.so         [.] malloc                                                                                                                                                  ◆
-  27.50%  dbscan   dbscan               [.] dist                                                                                                                                                    ▒
-  16.92%  dbscan   libc-2.28.so         [.] _int_free                                                                                                                                               ▒
-   9.06%  dbscan   dbscan               [.] isConnect                                                                                                                                               ▒
-   5.84%  dbscan   libstdc++.so.6.0.28  [.] operator new                                                                                                                                            ▒
-   3.78%  dbscan   libc-2.28.so         [.] cfree@GLIBC_2.2.5                                                                                                                                       ▒
-   3.09%  dbscan   libc-2.28.so         [.] __memmove_avx_unaligned_erms                                                                                                                            ▒
-   1.53%  dbscan   libstdc++.so.6.0.28  [.] operator delete@plt                                                                                                                                     ▒
-   1.12%  dbscan   dbscan               [.] memmove@plt                                                                                                                                             ▒
+  29.23%  dbscan   libc-2.28.so         [.] malloc     
+  27.50%  dbscan   dbscan               [.] dist     
+  16.92%  dbscan   libc-2.28.so         [.] _int_free   
+   9.06%  dbscan   dbscan               [.] isConnect     
+   5.84%  dbscan   libstdc++.so.6.0.28  [.] operator new   
+   3.78%  dbscan   libc-2.28.so         [.] cfree@GLIBC_2.2.5   
+   3.09%  dbscan   libc-2.28.so         [.] __memmove_avx_unaligned_erms  
+   1.53%  dbscan   libstdc++.so.6.0.28  [.] operator delete@plt      
+   1.12%  dbscan   dbscan               [.] memmove@plt          
    0.89%  dbscan   libstdc++.so.6.0.28  [.] malloc@plt        
 ```
 
