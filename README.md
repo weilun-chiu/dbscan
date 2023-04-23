@@ -7,6 +7,7 @@ This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clus
 - [Introduction](#introduction)
 - [Usage](#usage)
 - [Milestones](#milestones)
+- [Parallelism](#Parallelism)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -46,6 +47,9 @@ This project has five milestones:
 - [ ] **Parallelization**: Parallelize the algorithm using OpenMP to speed up computation and benchmark its performance.
 - [ ] **KDtree Optimization**: Implement KDtree optimization to further improve search time and benchmark its performance.
 - [ ] **Parallel KDtree**: Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
+
+## Parallelism
+https://docs.google.com/spreadsheets/d/e/2PACX-1vSdEBkERzn0uh9-CwF0zpwhULsWLiQJ1Z0PUkKsQyEQU1zo3NQOlgEBh55SsQt_D20Z6rgF4Speg3jE/pubchart?oid=261902049&format=interactive
 
 ## Contributing
 
