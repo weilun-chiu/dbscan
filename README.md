@@ -50,7 +50,7 @@ This project has five milestones:
 
 ## Parallelism
 <p align="center">
-    <img src="[https://docs.google.com/spreadsheets/d/e/2PACX-1vSdEBkERzn0uh9-CwF0zpwhULsWLiQJ1Z0PUkKsQyEQU1zo3NQOlgEBh55SsQt_D20Z6rgF4Speg3jE/pubchart?oid=261902049&format=interactive](https://imgur.com/a/P6QHmOP)" width="900"/>
+    <img src="[https://imgur.com/gallery/KJhQDpf]" width="900"/>
     <br>
     <br>
     <a href="./LICENSE.txt"><img alt="Apache License 2.0" src="https://raw.githubusercontent.com/s3prl/s3prl/main/file/license.svg" /></a>
