@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <numeric>
+
 #include "point.h"
 
 class DBSCAN {
@@ -25,6 +27,40 @@ protected:
     std::vector<int> dbscan_algorithm(std::vector<Point> points) override;
 };
 
+class UnionFind {
+public:
+    UnionFind() {}
+    UnionFind(int n) : parent(n) {
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+    
+    void setup(const int& n) {
+        parent.resize(n, 0);
+        std::iota(parent.begin(), parent.end(), 0);
+    }
+
+    int find(int x) {
+        while (x != parent[x]) {
+            x = parent[x];
+        }
+        return x;
+    }
+    
+    void unite(int x, int y) {
+        int root_x = find(x);
+        while (y != parent[y]) {
+            int next = parent[y];
+            parent[y] = root_x;
+            y = next;
+        }
+    }
+
+private:
+    std::vector<int> parent;
+};
+
 class GridDBSCAN : public DBSCAN{
 public:
     GridDBSCAN(double _eps, int _minPts);
@@ -34,10 +70,12 @@ private:
     std::vector<int> gridSize;
     std::vector<std::vector<Point>> grid;
     std::vector<bool> corecell;
+    std::vector<int> corecell_set;
     std::vector<int> visited;
     std::vector<int> cluster;
     int clusterIdx;
     int npoints;
+    UnionFind uf;
     void assignPoints(std::vector<Point> points);
     void mark_ingrid_corecell();
     void mark_outgrid_corecell();
@@ -45,6 +83,7 @@ private:
     std::vector<int> getClusterResults();
     std::vector<int> findNeighbor(int i);
     bool mark_outgrid_corecell_helper(int i);
+    void _expand_helper(int i);
     void expand_helper(int i);
 protected:
     std::vector<Point> preprocess(std::vector<Point> vp) override;

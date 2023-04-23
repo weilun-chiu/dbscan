@@ -11,8 +11,6 @@
 #include <algorithm>
 #include <iterator>
 
-
-
 double dist2(const std::vector<double>& lhs, const std::vector<double>& rhs) {
     double res{0.0f};
     for (int i=0; i<Point::dimensionality; i++) res += pow(lhs[i] - rhs[i], 2);

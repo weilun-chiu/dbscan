@@ -17,7 +17,7 @@
 #include "kdtree.h"
 #include "dbscan.h"
 
-
+#include <omp.h>
 
 std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> points) {
     std::cout << "Naive DBSCAN(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << std::endl;
@@ -33,19 +33,16 @@ std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> points) {
         std::vector<int> neighborIdxs = rangeQuery(points, i, eps);
         if (neighborIdxs.size() >= minPts) {
             cluster[i] = clusterIdx;
-            points[i].cluster_label = clusterIdx;
             for (int j = 0; j < neighborIdxs.size(); j++) {
                 int idx = neighborIdxs[j];
-                if (visited[idx] == 0) {
-                    visited[idx] = 1;
-                    std::vector<int> subNeighborIdxs = rangeQuery(points, idx, eps);
-                    if (subNeighborIdxs.size() >= minPts) {
-                        neighborIdxs.insert(neighborIdxs.end(), subNeighborIdxs.begin(), subNeighborIdxs.end());
-                    }
-                }
-                if (points[idx].cluster_label == -1) {
+                if (visited[idx] == 1) continue;
+                visited[idx] = 1;
+                if (cluster[idx] == -1) {
                     cluster[idx] = clusterIdx;
-                    points[idx].cluster_label = clusterIdx;
+                }
+                std::vector<int> subNeighborIdxs = rangeQuery(points, idx, eps);
+                if (subNeighborIdxs.size() >= minPts) {
+                    neighborIdxs.insert(neighborIdxs.end(), subNeighborIdxs.begin(), subNeighborIdxs.end());
                 }
             }
             clusterIdx++;
@@ -119,8 +116,11 @@ int getConnectCount(Point lhsp, std::vector<Point> rhs, double eps) {
 }
 
 GridDBSCAN::GridDBSCAN(double _eps, int _minPts)
-    :   DBSCAN(_eps, _minPts) 
-    {}
+    :   DBSCAN(_eps, _minPts), 
+        corecell_set(std::vector<int>())
+    {
+        
+    }
 
 std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> points) {
     gridCellSize = eps / sqrt(Point::dimensionality);
@@ -133,8 +133,10 @@ std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> points) {
     cluster.resize(gridSize1D, -1);
     clusterIdx = 0;
     npoints = points.size();
+    uf.setup(gridSize1D);
     return points;
 }
+
 void GridDBSCAN::assignPoints(std::vector<Point> points) {
     for (const auto& p : points) {
         std::vector<int> index(Point::dimensionality);
@@ -146,31 +148,33 @@ void GridDBSCAN::assignPoints(std::vector<Point> points) {
         grid[GridIndex1D].push_back(p);
     }
 }
+
 void GridDBSCAN::mark_ingrid_corecell() {
     for (int i=0; i<gridSize1D; i++) {
         if (grid[i].size() >= minPts) {
             corecell[i] = true;
+            corecell_set.push_back(i);
         } 
     }
 }
+
 void GridDBSCAN::mark_outgrid_corecell() {
     for (int i=0; i<gridSize1D; i++) {
         if (corecell[i] == true) continue;
         if (grid[i].size() == 0) continue;
-        if (grid[i].size() > 0) 
+        if (grid[i].size() > 0)
             corecell[i] = mark_outgrid_corecell_helper(i);
     }
 }
+
 void GridDBSCAN::expand() {
-    for (int i = 0; i < gridSize1D; i++) {
-        if (visited[i] == true) continue;
-        visited[i] = true;
-        if (corecell[i] == false) continue;
-        cluster[i] = clusterIdx;
+    #pragma omp parallel for
+    for (int _i = 0; _i < corecell_set.size(); _i++) {
+        int i = corecell_set[_i];
         expand_helper(i);
-        clusterIdx++;
     }
 }
+
 std::vector<int> GridDBSCAN::getClusterResults () {
     std::vector<int> pointsCluster(npoints, -1);
     for (int i=0; i<gridSize1D; i++) {
@@ -180,11 +184,13 @@ std::vector<int> GridDBSCAN::getClusterResults () {
     }
     return pointsCluster;
 }
+
 std::vector<int> GridDBSCAN::findNeighbor(int i) {
     std::vector<int> kDIndex(oneDToKDIdx(i, gridSize));
     std::vector<int> neighborsIn1D(getNeighborIndices(kDIndex, gridSize));
     return neighborsIn1D;
 }
+
 bool GridDBSCAN::mark_outgrid_corecell_helper(int i) {
     std::vector<int> neighbors=findNeighbor(i);
     for (const auto& g: grid[i]) {
@@ -192,13 +198,15 @@ bool GridDBSCAN::mark_outgrid_corecell_helper(int i) {
         for (const auto& nid: neighbors) {
             numConn += getConnectCount(g, grid[nid], eps);
             if (numConn >= minPts) {
+                corecell_set.push_back(i);
                 return true;
             }
         }
     }
     return false;
 }
-void GridDBSCAN::expand_helper(int i) {
+
+void GridDBSCAN::_expand_helper(int i) {
     std::queue<int> q;
     q.push(i);
     while (!q.empty()) {
@@ -217,6 +225,17 @@ void GridDBSCAN::expand_helper(int i) {
     }
 }
 
+void GridDBSCAN::expand_helper(int i) {
+    std::vector<int> neighbors=findNeighbor(i);
+    for (auto& ni:neighbors) {
+        if (isConnect(grid[i], grid[ni], eps)) {
+            if (i > ni) {
+                uf.unite(i, ni);
+            }
+        }
+    }
+}
+
 std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> points) {
     if (Point::dimensionality > 2) {
         std::cout << "Skip. Only support 2 dimension grid DBSCAN in this project." << std::endl;
@@ -227,12 +246,31 @@ std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> points) {
     auto start = std::chrono::high_resolution_clock::now();
 
     // Assign points to grid
+    auto _start = std::chrono::high_resolution_clock::now();
     assignPoints(points);
+    auto _end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> _elapsed = _end - _start;
+    std::cout << "Grid DBSCAN - assignPoints Elapsed time: " << _elapsed.count() << " seconds." << std::endl;
+
     // Mark core cell
+    _start = std::chrono::high_resolution_clock::now();
     mark_ingrid_corecell();
+    _end = std::chrono::high_resolution_clock::now();
+    _elapsed = _end - _start;
+    std::cout << "Grid DBSCAN - mark_ingrid_corecell  time: " << _elapsed.count() << " seconds." << std::endl;
+
+    _start = std::chrono::high_resolution_clock::now();
     mark_outgrid_corecell();
+    _end = std::chrono::high_resolution_clock::now();
+    _elapsed = _end - _start;
+    std::cout << "Grid DBSCAN - mark_outgrid_corecell Elapsed time: " << _elapsed.count() << " seconds." << std::endl;
+
     // Expand clustering
+    _start = std::chrono::high_resolution_clock::now();
     expand();
+    _end = std::chrono::high_resolution_clock::now();
+    _elapsed = _end - _start;
+    std::cout << "Grid DBSCAN - expand Elapsed time: " << _elapsed.count() << " seconds." << std::endl;
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
@@ -310,12 +348,10 @@ void DBSCAN::run(std::string filename) {
     Point::resetDimension();
     auto points(preprocess(normalize(parseDataset(filename))));
     auto cluster(dbscan_algorithm(points));
-    // print_clusters(points, cluster);
 }
 
 void DBSCAN::run(std::vector<std::vector<double>> data) {
     Point::resetDimension();
     auto points(preprocess(normalize(parseRandomGeneratedData(data))));
     auto cluster(dbscan_algorithm(points));
-    // print_clusters(points, cluster);
 }

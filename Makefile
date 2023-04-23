@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS=-Wall -Wextra -pedantic -std=c++14 -g
-LDFLAGS=
+CFLAGS=-Wall -Wextra -pedantic -std=c++14 -O2 -g -fopenmp -lpthread
+LDFLAGS=-fopenmp -lpthread
 
 SRCS=main.cpp utils.cpp point.cpp kdtree.cpp dbscan.cpp
 OBJS=$(SRCS:.cpp=.o)
