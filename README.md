@@ -49,7 +49,7 @@ This project has five milestones:
 - [ ] **Parallel KDtree**: Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
 
 ## Parallelism
-https://docs.google.com/spreadsheets/d/e/2PACX-1vSdEBkERzn0uh9-CwF0zpwhULsWLiQJ1Z0PUkKsQyEQU1zo3NQOlgEBh55SsQt_D20Z6rgF4Speg3jE/pubchart?oid=261902049&format=interactive
+![alt text](https://docs.google.com/spreadsheets/d/e/2PACX-1vSdEBkERzn0uh9-CwF0zpwhULsWLiQJ1Z0PUkKsQyEQU1zo3NQOlgEBh55SsQt_D20Z6rgF4Speg3jE/pubchart?oid=261902049&format=interactive)
 
 ## Contributing
 
