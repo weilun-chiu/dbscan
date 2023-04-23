@@ -9,7 +9,7 @@ This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clus
 - [Example](#Example)
 - [Milestones](#milestones)
 - [Parallelism](#Parallelism)
-- [Future works](#Future works)
+- [Futureworks](#Futureworks)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -95,7 +95,7 @@ The perf stat looks normal in terms of the performance counter statistics. It pr
        0.022818000 seconds sys
 ```
 
-## Future works
+## Futureworks
 
 - [ ] **KDtree Optimization**: (future work) Implement KDtree optimization to further improve search time and benchmark its performance.
 - [ ] **Parallel KDtree**: (future work) Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
