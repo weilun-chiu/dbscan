@@ -49,7 +49,16 @@ This project has five milestones:
 - [ ] **Parallel KDtree**: Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
 
 ## Parallelism
-![alt text](https://docs.google.com/spreadsheets/d/e/2PACX-1vSdEBkERzn0uh9-CwF0zpwhULsWLiQJ1Z0PUkKsQyEQU1zo3NQOlgEBh55SsQt_D20Z6rgF4Speg3jE/pubchart?oid=261902049&format=interactive)
+<p align="center">
+    <img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSdEBkERzn0uh9-CwF0zpwhULsWLiQJ1Z0PUkKsQyEQU1zo3NQOlgEBh55SsQt_D20Z6rgF4Speg3jE/pubchart?oid=261902049&format=interactive" width="900"/>
+    <br>
+    <br>
+    <a href="./LICENSE.txt"><img alt="Apache License 2.0" src="https://raw.githubusercontent.com/s3prl/s3prl/main/file/license.svg" /></a>
+    <a href="https://creativecommons.org/licenses/by-nc/4.0/"><img alt="CC_BY_NC License" src="https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg" /></a>
+    <a href="https://github.com/s3prl/s3prl/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/s3prl/s3prl/actions/workflows/ci.yml/badge.svg?branch=main&event=push"></a>
+    <a href="#development-pattern-for-contributors"><img alt="Codecov" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg"></a>
+    <a href="https://github.com/s3prl/s3prl/issues"><img alt="Bitbucket open issues" src="https://img.shields.io/github/issues/s3prl/s3prl"></a>
+</p>
 
 ## Contributing
 
