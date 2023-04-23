@@ -45,9 +45,9 @@ This project has five milestones:
 
 - [x] **Naive Approach**: Implement DBSCAN using a naive approach and benchmark its performance.
 - [x] **Grid-Based Approach**: Optimize the algorithm by using a grid-based approach for neighbor search and benchmark its performance.
-- [ ] **Parallelization**: Parallelize the algorithm using OpenMP to speed up computation and benchmark its performance.
-- [ ] **KDtree Optimization**: Implement KDtree optimization to further improve search time and benchmark its performance.
-- [ ] **Parallel KDtree**: Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
+- [x] **Parallelization**: Parallelize the algorithm using OpenMP to speed up computation and benchmark its performance.
+- [ ] **KDtree Optimization**: (future work) Implement KDtree optimization to further improve search time and benchmark its performance.
+- [ ] **Parallel KDtree**: (future work) Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
 
 ## Parallelism
 
