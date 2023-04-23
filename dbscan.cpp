@@ -168,7 +168,7 @@ void GridDBSCAN::mark_outgrid_corecell() {
 }
 
 void GridDBSCAN::expand() {
-    #pragma omp parallel for
+    #pragma omp parallel for shared(uf, grid)
     for (int _i = 0; _i < corecell_set.size(); _i++) {
         int i = corecell_set[_i];
         expand_helper(i);
@@ -264,6 +264,8 @@ std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> points) {
     _end = std::chrono::high_resolution_clock::now();
     _elapsed = _end - _start;
     std::cout << "Grid DBSCAN - mark_outgrid_corecell Elapsed time: " << _elapsed.count() << " seconds." << std::endl;
+
+    std::cout << "corecell_set:" << corecell_set.size() << std::endl;
 
     // Expand clustering
     _start = std::chrono::high_resolution_clock::now();
