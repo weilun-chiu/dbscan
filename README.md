@@ -11,7 +11,6 @@ This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clus
 - [Parallelism](#Parallelism)
 - [Futureworks](#Futureworks)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
@@ -105,7 +104,3 @@ One of the main drawbacks of DBSCAN in high dimensional space is the "curse of d
 ## Contributing
 
 We welcome contributions to this project! If you would like to contribute, please submit a pull request with your changes.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
