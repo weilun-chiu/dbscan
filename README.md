@@ -21,7 +21,7 @@ This project aims to provide an efficient and scalable implementation of DBSCAN 
 To make use of this project, you can add the DBSCAN header file #include "dbscan.h" to your C++ project and create instances of the provided dbscan object types listed below. These objects take your data as an input parameter, and the result will be a vector containing cluster labels for every point in your dataset.
 
 * NaiveDBSCAN
-* GridDBSCAN(Only support dimension <= 2 now)
+* GridDBSCAN
 
 ## Example
 
