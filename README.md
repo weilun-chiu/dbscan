@@ -6,6 +6,7 @@ This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clus
 
 - [Introduction](#introduction)
 - [Usage](#usage)
+- [Example](#Example)
 - [Milestones](#milestones)
 - [Parallelism](#Parallelism)
 - [Contributing](#contributing)
@@ -22,7 +23,7 @@ To make use of this project, you can add the DBSCAN header file #include "dbscan
 * NaiveDBSCAN
 * GridDBSCAN(Only support dimension <= 2 now)
 
-## Eample
+## Example
 
 The `main.cpp` file serves as the primary example of usage, while the `test.cpp` file exhibits the results of the unit tests.
 
