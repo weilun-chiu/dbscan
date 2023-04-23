@@ -51,8 +51,14 @@ This project has five milestones:
 ## Parallelism
 OpenMP on Grid DBSCAN
 
-![alt text](https://i.imgur.com/Qk3rBbz.png)
-![alt text](https://i.imgur.com/Xy2ul3G.png)
+<div style="display: flex;">
+  <div style="flex: 50%;">
+    <img src="https://i.imgur.com/Qk3rBbz.png" alt="Left Image">
+  </div>
+  <div style="flex: 50%;">
+    <img src="https://i.imgur.com/Xy2ul3G.png" alt="Right Image">
+  </div>
+</div>
 
 ## Contributing
 
