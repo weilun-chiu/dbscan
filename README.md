@@ -57,7 +57,7 @@ Our initial attempt to parallelize the grid-based DBSCAN algorithm(n:50000, clus
 ![alt text](https://i.imgur.com/Xy2ul3G.png)
 
 
-```
+```perf
 Samples: 347K of event 'cycles:u', Event count (approx.): 282010497999
 Overhead  Command  Shared Object        Symbol
   29.23%  dbscan   libc-2.28.so         [.] malloc     
@@ -72,7 +72,7 @@ Overhead  Command  Shared Object        Symbol
    0.89%  dbscan   libstdc++.so.6.0.28  [.] malloc@plt        
 ```
 
-```
+```perf
  Performance counter stats for './dbscan 0.2 2':
 
          87,602.85 msec task-clock:u              #    1.000 CPUs utilized          
