@@ -49,7 +49,9 @@ This project has five milestones:
 - [ ] **Parallel KDtree**: Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
 
 ## Parallelism
+OpenMP on Grid DBSCAN
 ![alt text](https://i.imgur.com/Qk3rBbz.png)
+![alt text](https://i.imgur.com/Xy2ul3G.png)
 
 ## Contributing
 
