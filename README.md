@@ -97,8 +97,10 @@ The perf stat looks normal in terms of the performance counter statistics. It pr
 
 ## Futureworks
 
-- [ ] **KDtree Optimization**: (future work) Implement KDtree optimization to further improve search time and benchmark its performance.
-- [ ] **Parallel KDtree**: (future work) Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
+One of the main drawbacks of DBSCAN in high dimensional space is the "curse of dimensionality." As the number of dimensions increases, the distance between points tends to become more uniform, and the density-based approach used by DBSCAN becomes less effective.  To overcome these limitations, KDTree can be used as an alternative approach to improve the performance of DBSCAN in high dimensional space. KDTree is a data structure that partitions data points into a tree structure based on their spatial proximity. This allows for efficient nearest neighbor searches, which are essential for density-based clustering algorithms like DBSCAN.
+
+- [ ] **KDtree Optimization**: Implement KDtree optimization to further improve search time and benchmark its performance.
+- [ ] **Parallel KDtree**: Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
 
 ## Contributing
 
