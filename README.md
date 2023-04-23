@@ -58,8 +58,6 @@ Our initial attempt to parallelize the grid-based DBSCAN algorithm(n:50000, clus
 
 This perf report shows the percentage of CPU cycles spent on different functions during the execution of the dbscan program. The dist function in the dbscan code accounts for 27.50% of the CPU cycles. The malloc function in the libc library accounts for 29.23% of the CPU cycles, followed by _int_free and isConnect. The report also shows that the operator new function in the libstdc++ library and the cfree function in the libc library account for a significant portion of the CPU cycles. This suggests that memory allocation and deallocation may be a bottleneck in the program's performance.
 
-The perf static board shows that everything works as expected. 
-
 ```perf
 Samples: 347K of event 'cycles:u', Event count (approx.): 282010497999
 Overhead  Command  Shared Object        Symbol
