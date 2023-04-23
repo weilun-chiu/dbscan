@@ -1,4 +1,4 @@
-# C++ Parallelized grid-based DBSCAN 
+# C++ Parallelized Grid-based DBSCAN 
 
 This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clustering of Applications with Noise), a popular clustering algorithm used in machine learning.
 
