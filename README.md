@@ -56,6 +56,44 @@ Our initial attempt to parallelize the grid-based DBSCAN algorithm(n:50000, clus
 ![alt text](https://i.imgur.com/Qk3rBbz.png)
 ![alt text](https://i.imgur.com/Xy2ul3G.png)
 
+
+```
+Samples: 347K of event 'cycles:u', Event count (approx.): 282010497999
+Overhead  Command  Shared Object        Symbol
+  29.23%  dbscan   libc-2.28.so         [.] malloc                                                                                                                                                  ◆
+  27.50%  dbscan   dbscan               [.] dist                                                                                                                                                    ▒
+  16.92%  dbscan   libc-2.28.so         [.] _int_free                                                                                                                                               ▒
+   9.06%  dbscan   dbscan               [.] isConnect                                                                                                                                               ▒
+   5.84%  dbscan   libstdc++.so.6.0.28  [.] operator new                                                                                                                                            ▒
+   3.78%  dbscan   libc-2.28.so         [.] cfree@GLIBC_2.2.5                                                                                                                                       ▒
+   3.09%  dbscan   libc-2.28.so         [.] __memmove_avx_unaligned_erms                                                                                                                            ▒
+   1.53%  dbscan   libstdc++.so.6.0.28  [.] operator delete@plt                                                                                                                                     ▒
+   1.12%  dbscan   dbscan               [.] memmove@plt                                                                                                                                             ▒
+   0.89%  dbscan   libstdc++.so.6.0.28  [.] malloc@plt        
+```
+
+```
+ Performance counter stats for './dbscan 0.2 2':
+
+         87,602.85 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+            11,303      page-faults:u             #    0.129 K/sec                  
+   284,992,059,313      cycles:u                  #    3.253 GHz                      (50.00%)
+        13,553,401      stalled-cycles-frontend:u #    0.00% frontend cycles idle     (50.00%)
+     4,873,430,201      stalled-cycles-backend:u  #    1.71% backend cycles idle      (50.00%)
+   925,491,792,090      instructions:u            #    3.25  insn per cycle         
+                                                  #    0.01  stalled cycles per insn  (50.00%)
+   226,426,881,223      branches:u                # 2584.698 M/sec                    (50.00%)
+         1,155,082      branch-misses:u           #    0.00% of all branches          (50.00%)
+
+      87.603927362 seconds time elapsed
+
+      87.006668000 seconds user
+       0.022818000 seconds sys
+```
+
+
 ## Contributing
 
 We welcome contributions to this project! If you would like to contribute, please submit a pull request with your changes.
