@@ -21,7 +21,7 @@ double dist(std::vector<double> const & lhs, std::vector<double> const & rhs) {
     return sqrt(dist2(lhs, rhs));
 }
 
-std::tuple<double, int> parseDBSCANArguments(int const argc, char const * const argv[]) {
+std::tuple<double, int> parseDBSCANArguments(int argc, char * argv[]) {
     double eps{0.12};
     int minPts{5};
     if (argc == 3) {
@@ -73,7 +73,7 @@ std::vector<Point> normalize(std::vector<Point> const & points) {
     return result;
 }
 
-std::vector<int> rangeQuery(std::vector<Point> const & points, int const p, double const eps) {
+std::vector<int> rangeQuery(std::vector<Point> const & points, int p, double eps) {
     std::vector<int> neighbors;
     for (int i = 0; i < points.size(); i++) {
         if (dist(points[p], points[i]) <= eps) {
@@ -83,7 +83,7 @@ std::vector<int> rangeQuery(std::vector<Point> const & points, int const p, doub
     return neighbors;
 }
 
-std::vector<Point> parseDataset(std::string const filename) 
+std::vector<Point> parseDataset(std::string filename) 
 {
     std::ifstream infile(filename);
     if (!infile.is_open()) {
@@ -110,7 +110,7 @@ std::vector<Point> parseDataset(std::string const filename)
     return vp;
 }
 
-std::vector<Point> parseRandomGeneratedData(std::vector<std::vector<double>> const generatedPoints) 
+std::vector<Point> parseRandomGeneratedData(std::vector<std::vector<double>> const & generatedPoints) 
 {
     std::vector<Point> vp{};
     const int n = generatedPoints.size();
