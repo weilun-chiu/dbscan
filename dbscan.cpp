@@ -19,7 +19,7 @@
 
 #include <omp.h>
 
-std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> points) {
+std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> const & points) {
     std::cout << "Naive DBSCAN(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<int> visited(points.size(), 0);
@@ -122,22 +122,9 @@ GridDBSCAN::GridDBSCAN(double _eps, int _minPts)
         
     }
 
-std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> points) {
-    gridCellSize = eps / sqrt(Point::dimensionality);
-    auto [max_values, min_values] = calculateMinMaxValues(points);
-    gridSize = getGridSize(max_values, min_values, gridCellSize);
-    gridSize1D = std::accumulate(gridSize.begin(), gridSize.end(), 1, std::multiplies<int>());
-    grid.resize(gridSize1D);
-    corecell.resize(gridSize1D, false);
-    visited.resize(gridSize1D, 0);
-    cluster.resize(gridSize1D, -1);
-    clusterIdx = 0;
-    npoints = points.size();
-    uf.setup(gridSize1D);
-    return points;
-}
 
-void GridDBSCAN::assignPoints(std::vector<Point> points) {
+
+void GridDBSCAN::assignPoints(std::vector<Point> const & points) {
     for (const auto& p : points) {
         std::vector<int> index(Point::dimensionality);
         double _gridCellSize = gridCellSize;
@@ -236,7 +223,22 @@ void GridDBSCAN::expand_helper(int i) {
     }
 }
 
-std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> points) {
+std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> const & points) {
+    gridCellSize = eps / sqrt(Point::dimensionality);
+    auto [max_values, min_values] = calculateMinMaxValues(points);
+    gridSize = getGridSize(max_values, min_values, gridCellSize);
+    gridSize1D = std::accumulate(gridSize.begin(), gridSize.end(), 1, std::multiplies<int>());
+    grid.resize(gridSize1D);
+    corecell.resize(gridSize1D, false);
+    visited.resize(gridSize1D, 0);
+    cluster.resize(gridSize1D, -1);
+    clusterIdx = 0;
+    npoints = points.size();
+    uf.setup(gridSize1D);
+    return points;
+}
+
+std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const & points) {
     if (Point::dimensionality > 2) {
         std::cout << "Skip. Only support 2 dimension grid DBSCAN in this project." << std::endl;
         return std::vector<int>(points.size(), -1);
