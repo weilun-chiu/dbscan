@@ -19,7 +19,7 @@
 
 #include <omp.h>
 
-std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> const & points) {
+std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> const& points) {
     std::cout << "Naive DBSCAN(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<int> visited(points.size(), 0);
@@ -124,7 +124,7 @@ GridDBSCAN::GridDBSCAN(double _eps, int _minPts)
 
 
 
-void GridDBSCAN::assignPoints(std::vector<Point> const & points) {
+void GridDBSCAN::assignPoints(std::vector<Point> const& points) {
     for (const auto& p : points) {
         std::vector<int> index(Point::dimensionality);
         double _gridCellSize = gridCellSize;
@@ -223,7 +223,7 @@ void GridDBSCAN::expand_helper(int i) {
     }
 }
 
-std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> const & points) {
+std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> const& points) {
     gridCellSize = eps / sqrt(Point::dimensionality);
     auto [max_values, min_values] = calculateMinMaxValues(points);
     gridSize = getGridSize(max_values, min_values, gridCellSize);
@@ -238,7 +238,7 @@ std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> const & points) {
     return points;
 }
 
-std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const & points) {
+std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const& points) {
     if (Point::dimensionality > 2) {
         std::cout << "Skip. Only support 2 dimension grid DBSCAN in this project." << std::endl;
         return std::vector<int>(points.size(), -1);

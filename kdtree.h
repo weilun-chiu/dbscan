@@ -10,16 +10,16 @@
 class KDTree {
 public:
     // CTORs
-    KDTree(std::vector<Point> ps, int _leafsize=30);
+    KDTree(std::vector<Point> const& points, int _leafsize=30);
     // rm CPYTORs, assignment op
     KDTree(KDTree const& other)=delete;
     KDTree& operator=(KDTree const& other)=delete;
     // API
-    std::vector<int> search(const Point& target_point, const double distance);
+    std::vector<int> search(const Point& target_point, double distance);
 private:
 
-    std::shared_ptr<KDNode> root;
+    std::unique_ptr<KDNode> root;
     size_t leafsize;
-    void buildTreeHelper(std::vector<Point> points, std::shared_ptr<KDNode>& curr_node, const size_t depth);
-    void searchHelper(const KDNode* curr_node, const Point& target_point, const double distance, std::vector<int>& points, const size_t depth);
+    void buildTree(std::vector<Point> const& points, KDNode * curr_node, size_t depth);
+    void searchHelper(KDNode const * const curr_node, Point const& target_point, double eps, std::vector<int>& results, size_t depth);
 };

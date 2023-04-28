@@ -15,16 +15,16 @@ public:
 protected:
     double eps;
     int minPts;
-    virtual std::vector<Point> preprocess(std::vector<Point> const & vp) = 0;
-    virtual std::vector<int> dbscan_algorithm(std::vector<Point> const & points) = 0;
+    virtual std::vector<Point> preprocess(std::vector<Point> const& vp) = 0;
+    virtual std::vector<int> dbscan_algorithm(std::vector<Point> const& points) = 0;
 };
 
 class NaiveDBSCAN : public DBSCAN{
 public:
     NaiveDBSCAN(double _eps, int _minPts) : DBSCAN(_eps, _minPts) {}
 protected:
-    std::vector<Point> preprocess(std::vector<Point> const & vp) override {return vp;}
-    std::vector<int> dbscan_algorithm(std::vector<Point> const & points) override;
+    std::vector<Point> preprocess(std::vector<Point> const& vp) override {return vp;}
+    std::vector<int> dbscan_algorithm(std::vector<Point> const& points) override;
 };
 
 class UnionFind {
@@ -76,7 +76,7 @@ private:
     int clusterIdx;
     int npoints;
     UnionFind uf;
-    void assignPoints(std::vector<Point> const & points);
+    void assignPoints(std::vector<Point> const& points);
     void mark_ingrid_corecell();
     void mark_outgrid_corecell();
     void expand();
@@ -86,6 +86,6 @@ private:
     void _expand_helper(int i);
     void expand_helper(int i);
 protected:
-    std::vector<Point> preprocess(std::vector<Point> const & vp) override;
-    std::vector<int> dbscan_algorithm(std::vector<Point> const & points) override;
+    std::vector<Point> preprocess(std::vector<Point> const& vp) override;
+    std::vector<int> dbscan_algorithm(std::vector<Point> const& points) override;
 };

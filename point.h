@@ -15,7 +15,7 @@ public:
     std::vector<double> coords;
     static size_t dimensionality;
     // CTORs
-    Point(const int _label, const std::vector<double> vd, const int _id = -1): label{_label}, id{_id}, cluster_label{-1}, coords{vd} {
+    Point(int _label, std::vector<double> const& vd, int _id = -1): label{_label}, id{_id}, cluster_label{-1}, coords{vd} {
         if (dimensionality == 0) {
             dimensionality = coords.size();
         } else if (dimensionality != coords.size()) {
@@ -43,20 +43,20 @@ public:
     operator std::vector<double>() const {
         return coords;
     }
-    void resize(const size_t d) {coords.resize(d);}
-    Point& operator+=(const std::vector<double> rhs) {
+    void resize(size_t d) {coords.resize(d);}
+    Point& operator+=(std::vector<double> const& rhs) {
         for (int i = 0; i < dimensionality; i++) {
             coords[i] += rhs[i];
         }
         return *this;
     }
-    Point& operator-=(const std::vector<double> rhs) {
+    Point& operator-=(std::vector<double> const& rhs) {
         for (int i = 0; i < dimensionality; i++) {
             coords[i] -= rhs[i];
         }
         return *this;
     }
-    Point& operator/=(const std::vector<double> rhs) {
+    Point& operator/=(std::vector<double> const& rhs) {
         for (int i = 0; i < dimensionality; i++) {
             double div = rhs[i];
             if (div == 0) {
@@ -66,7 +66,7 @@ public:
         }
         return *this;
     }
-    Point& operator*=(const std::vector<double> rhs) {
+    Point& operator*=(std::vector<double> const& rhs) {
         for (int i = 0; i < dimensionality; i++) {
             coords[i] *= rhs[i];
         }
@@ -100,7 +100,7 @@ public:
         }
         return *this;
     }
-    double operator[](const int i) const{
+    double operator[](int i) const{
         return coords[i];
     }
     Point& operator=(Point rhs) {
@@ -113,16 +113,16 @@ public:
     void operator=(std::vector<double> rhs) {
         std::swap(coords, rhs);
     }
-    bool operator==(const std::vector<double> rhs) const{
+    bool operator==(std::vector<double> const& rhs) const{
         for (int i=0; i<dimensionality; i++)
             if (coords[i] != rhs[i])
                 return false;
         return true;
     }
-    bool operator!=(const std::vector<double>& rhs) const{
+    bool operator!=(std::vector<double> const& rhs) const{
         return !(*this == rhs);
     }
-    bool operator<(const std::vector<double>& rhs) const {
+    bool operator<(std::vector<double> const& rhs) const {
         if (dimensionality != rhs.size()) {
             throw std::invalid_argument("Vectors must be of same size");
         }
@@ -135,18 +135,18 @@ public:
         }
         return false;
     }
-    friend std::ostream& operator<<(std::ostream& os, const Point& obj) {
+    friend std::ostream& operator<<(std::ostream& os, Point const& obj) {
         for (auto &p : obj.coords)
             os << p << " ";
         return os;
     }
     // Helper functions
-    double dist2(const std::vector<double>& rhs) const {
+    double dist2(std::vector<double> const& rhs) const {
         double res{0.0f};
         for (int i=0; i<dimensionality; i++) res += pow(coords[i] - rhs[i], 2);
         return res;
     }
-    double dist(const std::vector<double>& rhs) const {
+    double dist(std::vector<double> const& rhs) const {
         return sqrt(dist2(rhs));
     }
 };

@@ -11,13 +11,13 @@
 #include <algorithm>
 #include <iterator>
 
-double dist2(std::vector<double> const & lhs, std::vector<double> const & rhs) {
+double dist2(std::vector<double> const& lhs, std::vector<double> const& rhs) {
     double res{0.0f};
     for (int i=0; i<Point::dimensionality; i++) res += pow(lhs[i] - rhs[i], 2);
     return res;
 }
 
-double dist(std::vector<double> const & lhs, std::vector<double> const & rhs) {
+double dist(std::vector<double> const& lhs, std::vector<double> const& rhs) {
     return sqrt(dist2(lhs, rhs));
 }
 
@@ -32,7 +32,7 @@ std::tuple<double, int> parseDBSCANArguments(int argc, char * argv[]) {
     return {eps, minPts};
 }
 
-std::tuple<std::vector<double>, std::vector<double>> calculateMinMaxValues(std::vector<Point> const & points) {
+std::tuple<std::vector<double>, std::vector<double>> calculateMinMaxValues(std::vector<Point> const& points) {
     std::vector<double> max_values(Point::dimensionality, std::numeric_limits<double>::min());
     std::vector<double> min_values(Point::dimensionality, std::numeric_limits<double>::max());
     
@@ -46,7 +46,7 @@ std::tuple<std::vector<double>, std::vector<double>> calculateMinMaxValues(std::
     return std::tie(max_values, min_values);
 }
 
-std::vector<double> normalize_point(Point const & point, std::vector<double> const & max_values, std::vector<double> const & min_values) {
+std::vector<double> normalize_point(Point const& point, std::vector<double> const& max_values, std::vector<double> const& min_values) {
     std::vector<double> normalized_point(Point::dimensionality);
     for (int i = 0; i < Point::dimensionality; i++) {
         normalized_point[i] = (point[i] - min_values[i]) / (max_values[i] - min_values[i]);
@@ -54,7 +54,7 @@ std::vector<double> normalize_point(Point const & point, std::vector<double> con
     return normalized_point;
 }
 
-std::vector<Point> normalize(std::vector<Point> const & points) {
+std::vector<Point> normalize(std::vector<Point> const& points) {
     std::vector<Point> result = points;
 
     if (points.empty()) {
@@ -73,7 +73,7 @@ std::vector<Point> normalize(std::vector<Point> const & points) {
     return result;
 }
 
-std::vector<int> rangeQuery(std::vector<Point> const & points, int p, double eps) {
+std::vector<int> rangeQuery(std::vector<Point> const& points, int p, double eps) {
     std::vector<int> neighbors;
     for (int i = 0; i < points.size(); i++) {
         if (dist(points[p], points[i]) <= eps) {
@@ -110,7 +110,7 @@ std::vector<Point> parseDataset(std::string filename)
     return vp;
 }
 
-std::vector<Point> parseRandomGeneratedData(std::vector<std::vector<double>> const & generatedPoints) 
+std::vector<Point> parseRandomGeneratedData(std::vector<std::vector<double>> const& generatedPoints) 
 {
     std::vector<Point> vp{};
     const int n = generatedPoints.size();
