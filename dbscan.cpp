@@ -20,7 +20,7 @@
 #include <omp.h>
 
 std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> const& points) {
-    std::cout << "Naive DBSCAN(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << std::endl;
+    std::cout << "Naive DBSCAN(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << '\n';
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<int> visited(points.size(), 0);
     std::vector<int> cluster(points.size(), -1);
@@ -50,7 +50,7 @@ std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> const& points)
     }
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
-    std::cout << "Elapsed time: " << elapsed.count() << " seconds." << std::endl;
+    std::cout << "Elapsed time: " << elapsed.count() << " seconds." << '\n';
     return cluster;
 }
 
@@ -240,11 +240,11 @@ std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> const& points) {
 
 std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const& points) {
     if (Point::dimensionality > 2) {
-        std::cout << "Skip. Only support 2 dimension grid DBSCAN in this project." << std::endl;
+        std::cout << "Skip. Only support 2 dimension grid DBSCAN in this project." << '\n';
         return std::vector<int>(points.size(), -1);
     }
 
-    std::cout << "Grid DBSCAN(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << std::endl;
+    std::cout << "Grid DBSCAN(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << '\n';
     auto start = std::chrono::high_resolution_clock::now();
 
     // Assign points to grid
@@ -252,33 +252,33 @@ std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const& points) 
     assignPoints(points);
     auto _end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> _elapsed = _end - _start;
-    std::cout << "Grid DBSCAN - assignPoints Elapsed time: " << _elapsed.count() << " seconds." << std::endl;
+    std::cout << "Grid DBSCAN - assignPoints Elapsed time: " << _elapsed.count() << " seconds." << '\n';
 
     // Mark core cell
     _start = std::chrono::high_resolution_clock::now();
     mark_ingrid_corecell();
     _end = std::chrono::high_resolution_clock::now();
     _elapsed = _end - _start;
-    std::cout << "Grid DBSCAN - mark_ingrid_corecell  time: " << _elapsed.count() << " seconds." << std::endl;
+    std::cout << "Grid DBSCAN - mark_ingrid_corecell  time: " << _elapsed.count() << " seconds." << '\n';
 
     _start = std::chrono::high_resolution_clock::now();
     mark_outgrid_corecell();
     _end = std::chrono::high_resolution_clock::now();
     _elapsed = _end - _start;
-    std::cout << "Grid DBSCAN - mark_outgrid_corecell Elapsed time: " << _elapsed.count() << " seconds." << std::endl;
+    std::cout << "Grid DBSCAN - mark_outgrid_corecell Elapsed time: " << _elapsed.count() << " seconds." << '\n';
 
-    std::cout << "corecell_set:" << corecell_set.size() << std::endl;
+    std::cout << "corecell_set:" << corecell_set.size() << '\n';
 
     // Expand clustering
     _start = std::chrono::high_resolution_clock::now();
     expand();
     _end = std::chrono::high_resolution_clock::now();
     _elapsed = _end - _start;
-    std::cout << "Grid DBSCAN - expand Elapsed time: " << _elapsed.count() << " seconds." << std::endl;
+    std::cout << "Grid DBSCAN - expand Elapsed time: " << _elapsed.count() << " seconds." << '\n';
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
-    std::cout << "Elapsed time: " << elapsed.count() << " seconds." << std::endl;
+    std::cout << "Elapsed time: " << elapsed.count() << " seconds." << '\n';
     
     std::vector<int> pointsCluster = getClusterResults();
     return pointsCluster;
@@ -335,7 +335,7 @@ std::vector<int> kdtree_dbscan(std::vector<Point>& points, double eps, int minPt
 
 void print_clusters(const std::vector<Point>& points, const std::vector<int>& cluster) {
     int clusterCount = *std::max_element(cluster.begin(), cluster.end()) + 1;
-    std::cout << "Clusters: " << clusterCount << std::endl;
+    std::cout << "Clusters: " << clusterCount << '\n';
     for (int i = 0; i < points.size(); i++) {
         std::cout << "(";
         for (int j = 0; j < points[i].coords.size(); j++) {
@@ -344,7 +344,7 @@ void print_clusters(const std::vector<Point>& points, const std::vector<int>& cl
                 std::cout << ", ";
             }
         }
-        std::cout << "): " << cluster[i] << std::endl;
+        std::cout << "): " << cluster[i] << '\n';
     }
 }
 

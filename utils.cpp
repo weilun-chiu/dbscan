@@ -28,7 +28,7 @@ std::tuple<double, int> parseDBSCANArguments(int argc, char * argv[]) {
         eps = std::stof(argv[1]);
         minPts = std::stoi(argv[2]);
     }
-    std::cout << "eps: " << eps << "  minPts: " << minPts << std::endl;
+    std::cout << "eps: " << eps << "  minPts: " << minPts << '\n';
     return {eps, minPts};
 }
 
