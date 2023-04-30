@@ -98,7 +98,7 @@ We further exame the another settings (eps: 0.12  minPts: 5) and observe better 
 
 We also implement another parallel framework: C++ Concurrency API.
 
-![alt text]https://i.imgur.com/Ito9Yd8.png
+![alt text](https://i.imgur.com/Ito9Yd8.png)
 
 
 ## Futureworks
