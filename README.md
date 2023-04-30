@@ -49,6 +49,16 @@ This project has three milestones:
 
 ## Parallelism
 
+Serial Runtime Analysis
+
+| Procedure              | Runtime    | Percentage |
+| ----------------------| ---------- | -----------|
+| assignPoints           | 0.011691   | 0.9601%    |
+| mark_ingrid_corecell   | 1.68E-06   | 0.0001%    |
+| mark_outgrid_corecell  | 0.00318535 | 0.2632%    |
+| expand                 | 1.21085    | 99.7766%   |
+
+
 Our initial attempt to parallelize the grid-based DBSCAN algorithm(n:50000, cluster:3, eps:0.2, minPts:2) showed that we achieved close to 2x speedup using 2 threads, but we didn't observe further benefits with more threads. Parallelizing grid-based DBSCAN is challenging due to load balancing, communication overhead, and maintaining correctness, but can be done with careful consideration.
 
 ![alt text](https://i.imgur.com/Qk3rBbz.png)
