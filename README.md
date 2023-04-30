@@ -112,7 +112,7 @@ The perf stat looks normal in terms of the performance counter statistics. It pr
        0.022818000 seconds sys
 ```
 
-### C++ Concurrency API and Work Stealing
+### C++ Concurrency API and Work-Stealing Technique
 
 C++ concurrency API is a set of tools and libraries added to the C++ Standard Library to support writing concurrent and parallel code in C++. It was introduced in the C++11 standard, which was released in 2011. The API includes features like threads, mutexes, condition variables, futures, promises, and atomics, which allow developers to create and manage threads, protect shared resources, coordinate task execution, and synchronize asynchronous operations. The API is designed to be portable and efficient, but requires careful attention to detail and a good understanding of concurrency concepts.
 
