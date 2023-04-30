@@ -68,7 +68,7 @@ This project has three milestones:
 | mark_outgrid_corecell  | 0.00318535 | 0.2599%    |
 | expand                 | 1.21085    | 98.7861%   |
 
-Based on the provided data, it can be observed that the "expand" procedure takes up the majority of the runtime with 99.7766%. This indicates that improving the performance of the "expand" procedure should be the primary target for optimizing the overall performance of the system.
+Based on the provided data, it can be observed that the "expand" procedure takes up the majority of the runtime with 98.7861%. This indicates that improving the performance of the "expand" procedure should be the primary target for optimizing the overall performance of the system.
 
 Meanwhile, the other procedures such as "assignPoints" and "mark_outgrid_corecell" take up a relatively small portion of the runtime, at 0.9601% and 0.2632% respectively. The "mark_ingrid_corecell" procedure takes up a negligible amount of runtime at 0.0001%.
 
