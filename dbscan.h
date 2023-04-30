@@ -4,6 +4,8 @@
 #include <string>
 #include <functional>
 #include <numeric>
+#include <deque>
+
 
 #include "point.h"
 
@@ -31,12 +33,10 @@ class UnionFind {
 public:
     UnionFind() {}
     UnionFind(int n) : parent(n) {
-        for (int i = 0; i < n; i++) {
-            parent[i] = i;
-        }
+        std::iota(parent.begin(), parent.end(), 0);
     }
     
-    void setup(const int& n) {
+    void setup(int n) {
         parent.resize(n, 0);
         std::iota(parent.begin(), parent.end(), 0);
     }
@@ -63,8 +63,8 @@ private:
 
 class GridDBSCAN : public DBSCAN{
 public:
-    GridDBSCAN(double _eps, int _minPts);
-private:
+    GridDBSCAN(double _eps, int _minPts, std::string _className);
+protected:
     int gridSize1D;
     double gridCellSize;
     std::vector<int> gridSize;
@@ -76,16 +76,46 @@ private:
     int clusterIdx;
     int npoints;
     UnionFind uf;
+    std::string className;
     void assignPoints(std::vector<Point> const& points);
     void mark_ingrid_corecell();
     void mark_outgrid_corecell();
-    void expand();
+    virtual void expand() = 0;
     std::vector<int> getClusterResults();
     std::vector<int> findNeighbor(int i);
     bool mark_outgrid_corecell_helper(int i);
     void _expand_helper(int i);
     void expand_helper(int i);
-protected:
     std::vector<Point> preprocess(std::vector<Point> const& vp) override;
     std::vector<int> dbscan_algorithm(std::vector<Point> const& points) override;
+};
+
+class SerialGridDBSCAN : public GridDBSCAN{
+public:
+    SerialGridDBSCAN(double _eps, int _minPts) : GridDBSCAN(_eps, _minPts, "SerialGridDBSCAN") {}
+protected:
+    void expand() override;
+};
+
+class OMPGridDBSCAN : public GridDBSCAN{
+public:
+    OMPGridDBSCAN(double _eps, int _minPts);
+protected:
+    void expand() override;
+};
+
+class ConcurrencyGridDBSCAN : public GridDBSCAN{
+public:
+    ConcurrencyGridDBSCAN(double _eps, int _minPts);
+protected:
+    void expand() override;
+    void expand_helper(int lo, int hi);
+};
+
+class ConcurrencyStealingGridDBSCAN : public GridDBSCAN{
+public:
+    ConcurrencyStealingGridDBSCAN(double _eps, int _minPts);
+protected:
+    void expand() override;
+    void expand_helper(std::deque<int> *cells);
 };

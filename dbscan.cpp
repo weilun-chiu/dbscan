@@ -11,6 +11,9 @@
 #include <functional>
 #include <chrono>
 #include <queue>
+#include <future>
+#include <deque>
+
 
 #include "utils.h"
 #include "point.h"
@@ -54,7 +57,7 @@ std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> const& points)
     return cluster;
 }
 
-std::vector<int> getGridSize(const std::vector<double>& max_values, const std::vector<double>& min_values, double gridCellSize) {
+std::vector<int> getGridSize(std::vector<double> const& max_values, std::vector<double> const& min_values, double gridCellSize) {
     std::vector<int> gridSize(max_values.size());
     for (int i = 0; i < max_values.size(); i++) {
         gridSize[i] = static_cast<int>(std::ceil((max_values[i] - min_values[i]) / gridCellSize));
@@ -62,7 +65,7 @@ std::vector<int> getGridSize(const std::vector<double>& max_values, const std::v
     return gridSize;
 }
 
-int kDTo1DIdx(const std::vector<int>& index, const std::vector<int>& gridSize) {
+int kDTo1DIdx(std::vector<int> const& index, std::vector<int> const& gridSize) {
     int k = index.size();
     int Idx1D = index[0];
     int stride = 1;
@@ -73,7 +76,7 @@ int kDTo1DIdx(const std::vector<int>& index, const std::vector<int>& gridSize) {
     return Idx1D;
 }
 
-std::vector<int> oneDToKDIdx(int index, const std::vector<int>& gridSize) {
+std::vector<int> oneDToKDIdx(int index, std::vector<int> const& gridSize) {
     std::vector<int> kDIdx(gridSize.size(), 0);
     int k = gridSize.size();
     for (int i = k - 1; i >= 0; i--) {
@@ -83,7 +86,7 @@ std::vector<int> oneDToKDIdx(int index, const std::vector<int>& gridSize) {
     return kDIdx;
 }
 
-std::vector<int> getNeighborIndices(const std::vector<int>& index, const std::vector<int>& gridSize) {
+std::vector<int> getNeighborIndices(std::vector<int> const& index, std::vector<int> const& gridSize) {
     std::vector<int> res{};
     if (Point::dimensionality == 1) {
         res = {index[0]-1, index[0]+1};
@@ -115,14 +118,13 @@ int getConnectCount(Point lhsp, std::vector<Point> rhs, double eps) {
     return numConn;
 }
 
-GridDBSCAN::GridDBSCAN(double _eps, int _minPts)
+GridDBSCAN::GridDBSCAN(double _eps, int _minPts, std::string _className)
     :   DBSCAN(_eps, _minPts), 
-        corecell_set(std::vector<int>())
+        corecell_set(std::vector<int>()),
+        className(_className)
     {
         
     }
-
-
 
 void GridDBSCAN::assignPoints(std::vector<Point> const& points) {
     for (const auto& p : points) {
@@ -154,7 +156,14 @@ void GridDBSCAN::mark_outgrid_corecell() {
     }
 }
 
-void GridDBSCAN::expand() {
+void SerialGridDBSCAN::expand() {
+    for (int _i = 0; _i < corecell_set.size(); _i++) {
+        int i = corecell_set[_i];
+        expand_helper(i);
+    }
+}
+
+void OMPGridDBSCAN::expand() {
     #pragma omp parallel for shared(uf, grid)
     for (int _i = 0; _i < corecell_set.size(); _i++) {
         int i = corecell_set[_i];
@@ -162,11 +171,84 @@ void GridDBSCAN::expand() {
     }
 }
 
+int get_number_of_threads() {
+    const char* env_threads = std::getenv("OMP_NUM_THREADS");
+    return (env_threads != nullptr) ? std::stoi(env_threads) : std::thread::hardware_concurrency();
+}
+
+void ConcurrencyGridDBSCAN::expand() {
+    std::vector<std::future<void>> futures;
+    int num_threads(get_number_of_threads());
+
+    int last(corecell_set.size());
+    int blockSize(last/num_threads);
+
+    int start = 0;
+
+    for (int _i = 0; _i < num_threads; _i++) {
+        using helper_func_t = void (ConcurrencyGridDBSCAN::*)(int, int);
+        helper_func_t helper_func_ptr = &ConcurrencyGridDBSCAN::expand_helper;
+        if (_i != num_threads-1)
+            futures.push_back(std::async(std::launch::async, helper_func_ptr, this, start, start+blockSize));
+        else
+            futures.push_back(std::async(std::launch::async, helper_func_ptr, this, start, last));
+        start += blockSize;
+    }
+
+    for (auto &future : futures) {
+        future.wait();
+    }
+}
+
+void ConcurrencyStealingGridDBSCAN::expand() {
+    std::vector<std::future<void>> futures;
+    int num_threads = get_number_of_threads();
+
+    std::deque<int> tasks;
+    for (int i = 0; i < corecell_set.size(); i++) {
+        tasks.push_back(corecell_set[i]);
+    }
+
+    std::vector<std::deque<int>> work(num_threads);
+    for (int i = 0; i < corecell_set.size(); i++) {
+        work[i % num_threads].push_back(tasks.front());
+        tasks.pop_front();
+    }
+
+    for (int i = 0; i < num_threads; i++) {
+        using helper_func_t = void (ConcurrencyStealingGridDBSCAN::*)(std::deque<int>*);
+        helper_func_t helper_func_ptr = &ConcurrencyStealingGridDBSCAN::expand_helper;
+        futures.push_back(std::async(std::launch::async, helper_func_ptr, this, &work[i]));
+    }
+
+    while (!tasks.empty()) {
+        bool allDone = true;
+        for (int i = 0; i < num_threads; i++) {
+            if (!work[i].empty()) {
+                allDone = false;
+                if (tasks.empty()) {
+                    continue;
+                }
+                int stolenWork = tasks.back();
+                tasks.pop_back();
+                work[i].push_back(stolenWork);
+            }
+        }
+        if (allDone) {
+            break;
+        }
+    }
+
+    for (auto &future : futures) {
+        future.wait();
+    }
+}
+
 std::vector<int> GridDBSCAN::getClusterResults () {
     std::vector<int> pointsCluster(npoints, -1);
     for (int i=0; i<gridSize1D; i++) {
         for (const auto& g: grid[i]) {
-            pointsCluster[g.id] = cluster[i];
+            pointsCluster[g.id] = uf.find(cluster[i]);
         }
     }
     return pointsCluster;
@@ -223,6 +305,35 @@ void GridDBSCAN::expand_helper(int i) {
     }
 }
 
+void ConcurrencyGridDBSCAN::expand_helper(int lo, int hi) {
+    for (int _i = lo; _i < hi; _i++) {
+        int i{corecell_set[_i]};
+        std::vector<int> neighbors=findNeighbor(i);
+        for (auto& ni:neighbors) {
+            if (isConnect(grid[i], grid[ni], eps)) {
+                if (i > ni) {
+                    uf.unite(i, ni);
+                }
+            }
+        }
+    }
+}
+
+void ConcurrencyStealingGridDBSCAN::expand_helper(std::deque<int> *cells) {
+    while (!cells->empty()) {
+        int cell_index = cells->front();
+        cells->pop_front();
+        std::vector<int> neighbors = findNeighbor(cell_index);
+        for (auto neighbor_index : neighbors) {
+            if (isConnect(grid[cell_index], grid[neighbor_index], eps)) {
+                if (cell_index > neighbor_index) {
+                    uf.unite(cell_index, neighbor_index);
+                }
+            }
+        }
+    }
+}
+
 std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> const& points) {
     gridCellSize = eps / sqrt(Point::dimensionality);
     auto [max_values, min_values] = calculateMinMaxValues(points);
@@ -240,11 +351,11 @@ std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> const& points) {
 
 std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const& points) {
     if (Point::dimensionality > 2) {
-        std::cout << "Skip. Only support 2 dimension grid DBSCAN in this project." << '\n';
+        std::cout << "Skip. Only support 2 dimension "<< className <<" in this project." << '\n';
         return std::vector<int>(points.size(), -1);
     }
 
-    std::cout << "Grid DBSCAN(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << '\n';
+    std::cout << className <<"(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << '\n';
     auto start = std::chrono::high_resolution_clock::now();
 
     // Assign points to grid
@@ -252,29 +363,29 @@ std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const& points) 
     assignPoints(points);
     auto _end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> _elapsed = _end - _start;
-    std::cout << "Grid DBSCAN - assignPoints Elapsed time: " << _elapsed.count() << " seconds." << '\n';
+    std::cout << className <<" - assignPoints Elapsed time: " << _elapsed.count() << " seconds." << '\n';
 
     // Mark core cell
     _start = std::chrono::high_resolution_clock::now();
     mark_ingrid_corecell();
     _end = std::chrono::high_resolution_clock::now();
     _elapsed = _end - _start;
-    std::cout << "Grid DBSCAN - mark_ingrid_corecell  time: " << _elapsed.count() << " seconds." << '\n';
+    std::cout << className <<" - mark_ingrid_corecell  time: " << _elapsed.count() << " seconds." << '\n';
 
     _start = std::chrono::high_resolution_clock::now();
     mark_outgrid_corecell();
     _end = std::chrono::high_resolution_clock::now();
     _elapsed = _end - _start;
-    std::cout << "Grid DBSCAN - mark_outgrid_corecell Elapsed time: " << _elapsed.count() << " seconds." << '\n';
+    std::cout << className <<" - mark_outgrid_corecell Elapsed time: " << _elapsed.count() << " seconds." << '\n';
 
-    std::cout << "corecell_set:" << corecell_set.size() << '\n';
+    std::cout << className <<" - corecell_set: " << corecell_set.size() << '\n';
 
     // Expand clustering
     _start = std::chrono::high_resolution_clock::now();
     expand();
     _end = std::chrono::high_resolution_clock::now();
     _elapsed = _end - _start;
-    std::cout << "Grid DBSCAN - expand Elapsed time: " << _elapsed.count() << " seconds." << '\n';
+    std::cout << className <<" - expand Elapsed time: " << _elapsed.count() << " seconds." << '\n';
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
@@ -284,7 +395,7 @@ std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const& points) 
     return pointsCluster;
 }
 
-std::vector<int> kdtree_dbscan(std::vector<Point>& points, double eps, int minPts) {
+std::vector<int> kdtree_dbscan(std::vector<Point> const& points, double eps, int minPts) {
     std::vector<int> visited(points.size(), 0);
     std::vector<int> cluster(points.size(), -1);
     int clusterIdx = 0;
@@ -333,7 +444,7 @@ std::vector<int> kdtree_dbscan(std::vector<Point>& points, double eps, int minPt
     return cluster;
 }
 
-void print_clusters(const std::vector<Point>& points, const std::vector<int>& cluster) {
+void print_clusters(std::vector<Point> const& points, std::vector<int> const& cluster) {
     int clusterCount = *std::max_element(cluster.begin(), cluster.end()) + 1;
     std::cout << "Clusters: " << clusterCount << '\n';
     for (int i = 0; i < points.size(); i++) {
@@ -358,4 +469,29 @@ void DBSCAN::run(std::vector<std::vector<double>> data) {
     Point::resetDimension();
     auto points(preprocess(normalize(parseRandomGeneratedData(data))));
     auto cluster(dbscan_algorithm(points));
+}
+
+OMPGridDBSCAN::OMPGridDBSCAN(double _eps, int _minPts)
+    : GridDBSCAN(_eps, _minPts, "OMPGridDBSCAN") 
+{
+    #pragma omp parallel 
+    {
+        #pragma omp single 
+        {
+            std::cout << "Number of threads: " << omp_get_num_threads() << '\n';
+        }
+    }
+}
+
+
+ConcurrencyGridDBSCAN::ConcurrencyGridDBSCAN(double _eps, int _minPts)
+    : GridDBSCAN(_eps, _minPts, "ConcurrencyGridDBSCAN") 
+{
+    std::cout << "Number of threads: " << get_number_of_threads() << "\n";
+}
+
+ConcurrencyStealingGridDBSCAN::ConcurrencyStealingGridDBSCAN(double _eps, int _minPts)
+    : GridDBSCAN(_eps, _minPts, "ConcurrencyStealingGridDBSCAN") 
+{
+    std::cout << "Number of threads: " << get_number_of_threads() << "\n";
 }
