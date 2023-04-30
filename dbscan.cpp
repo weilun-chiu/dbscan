@@ -13,6 +13,7 @@
 #include <queue>
 #include <future>
 #include <deque>
+#include <immintrin.h>
 
 
 #include "utils.h"
@@ -21,6 +22,44 @@
 #include "dbscan.h"
 
 #include <omp.h>
+
+bool anyDistWithinEps(__m256d lhs_x, __m256d lhs_y, __m256d rhs_x, __m256d rhs_y, __m256d eps_AVX) {
+    __m256d diff_x = _mm256_sub_pd(lhs_x, rhs_x);
+    __m256d diff_y = _mm256_sub_pd(lhs_y, rhs_y);
+    __m256d sqr_x = _mm256_mul_pd(diff_x, diff_x);
+    __m256d sqr_y = _mm256_mul_pd(diff_y, diff_y);
+    __m256d sum = _mm256_add_pd(sqr_x, sqr_y);
+    __m256d dist_squared = _mm256_sqrt_pd(sum);
+    __m256d cmp_result = _mm256_cmp_pd(dist_squared, eps_AVX, _CMP_LT_OS);
+    int mask = _mm256_movemask_pd(cmp_result);
+    if (mask != 0) {
+        return true;
+    }
+    return false;
+}
+
+bool isConnect_AVX(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
+    // Only support first 2 dimension
+
+    while ((rhs.size() % 4 )!= 0) {
+        Point copyPoint{rhs[rhs.size()-1]};
+        rhs.push_back(copyPoint);
+    }
+
+    __m256d eps_AVX = _mm256_set1_pd(eps);
+    for (const auto& lhsp: lhs) {
+        __m256d lhs_x = _mm256_set1_pd(lhsp[0]);
+        __m256d lhs_y = _mm256_set1_pd(lhsp[1]);
+        for (int i = 0; i < rhs.size(); i+=4) {
+            __m256d rhs_x = _mm256_set_pd(rhs[i + 3][0], rhs[i + 2][0], rhs[i + 1][0], rhs[i][0]);
+            __m256d rhs_y = _mm256_set_pd(rhs[i + 3][1], rhs[i + 2][1], rhs[i + 1][1], rhs[i][1]);
+            if (anyDistWithinEps(lhs_x, lhs_y, rhs_x, rhs_y, eps_AVX))
+                return true;
+        }
+    }
+    return false;
+}
+
 
 std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> const& points) {
     std::cout << "Naive DBSCAN(eps="<<eps<<", minPts="<<minPts<<") on datasize: " << points.size() << " in " << Point::dimensionality<<"-dimension space" << '\n';
@@ -459,10 +498,30 @@ void print_clusters(std::vector<Point> const& points, std::vector<int> const& cl
     }
 }
 
+void calculateAccuracy(std::vector<Point> const& points, std::vector<int> const& cluster) {
+    if (points.size() != cluster.size()) {
+        std::cout << "Unmatched size\n";
+        return;
+    }
+    const int n{static_cast<int>(points.size())};
+    int correct{0};
+    for (int i = 0; i < n; i++) {
+        if (points[i].label == cluster[i]) {
+            correct++;
+        }
+    }
+    if (n <= 0) {
+        std::cout << "No accuracy data due to 'Div by zero'. Please make sure the input data is not empty.\n" ;
+    } else {
+        std::cout << "Accuracy: " << static_cast<double>(correct)/n << "\n";
+    }
+}
+
 void DBSCAN::run(std::string filename) {
     Point::resetDimension();
     auto points(preprocess(normalize(parseDataset(filename))));
     auto cluster(dbscan_algorithm(points));
+    calculateAccuracy(points, cluster);
 }
 
 void DBSCAN::run(std::vector<std::vector<double>> data) {
@@ -495,3 +554,69 @@ ConcurrencyStealingGridDBSCAN::ConcurrencyStealingGridDBSCAN(double _eps, int _m
 {
     std::cout << "Number of threads: " << get_number_of_threads() << "\n";
 }
+
+ConcurrencyStealingAVX2GridDBSCAN::ConcurrencyStealingAVX2GridDBSCAN(double _eps, int _minPts)
+    : GridDBSCAN(_eps, _minPts, "ConcurrencyStealingAVX2GridDBSCAN")
+{
+    std::cout << "Number of threads: " << get_number_of_threads() << "\n";
+}
+
+void ConcurrencyStealingAVX2GridDBSCAN::expand() {
+    std::vector<std::future<void>> futures;
+    int num_threads = get_number_of_threads();
+
+    std::deque<int> tasks;
+    for (int i = 0; i < corecell_set.size(); i++) {
+        tasks.push_back(corecell_set[i]);
+    }
+
+    std::vector<std::deque<int>> work(num_threads);
+    for (int i = 0; i < corecell_set.size(); i++) {
+        work[i % num_threads].push_back(tasks.front());
+        tasks.pop_front();
+    }
+
+    for (int i = 0; i < num_threads; i++) {
+        using helper_func_t = void (ConcurrencyStealingAVX2GridDBSCAN::*)(std::deque<int>*);
+        helper_func_t helper_func_ptr = &ConcurrencyStealingAVX2GridDBSCAN::expand_helper;
+        futures.push_back(std::async(std::launch::async, helper_func_ptr, this, &work[i]));
+    }
+
+    while (!tasks.empty()) {
+        bool allDone = true;
+        for (int i = 0; i < num_threads; i++) {
+            if (!work[i].empty()) {
+                allDone = false;
+                if (tasks.empty()) {
+                    continue;
+                }
+                int stolenWork = tasks.back();
+                tasks.pop_back();
+                work[i].push_back(stolenWork);
+            }
+        }
+        if (allDone) {
+            break;
+        }
+    }
+
+    for (auto &future : futures) {
+        future.wait();
+    }
+}
+
+void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells) {
+    while (!cells->empty()) {
+        int cell_index = cells->front();
+        cells->pop_front();
+        std::vector<int> neighbors = findNeighbor(cell_index);
+        for (auto neighbor_index : neighbors) {
+            if (isConnect_AVX(grid[cell_index], grid[neighbor_index], eps)) {
+                if (cell_index > neighbor_index) {
+                    uf.unite(cell_index, neighbor_index);
+                }
+            }
+        }
+    }
+}
+

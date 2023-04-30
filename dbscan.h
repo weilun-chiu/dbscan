@@ -6,7 +6,6 @@
 #include <numeric>
 #include <deque>
 
-
 #include "point.h"
 
 class DBSCAN {
@@ -115,6 +114,14 @@ protected:
 class ConcurrencyStealingGridDBSCAN : public GridDBSCAN{
 public:
     ConcurrencyStealingGridDBSCAN(double _eps, int _minPts);
+protected:
+    void expand() override;
+    void expand_helper(std::deque<int> *cells);
+};
+
+class ConcurrencyStealingAVX2GridDBSCAN : public GridDBSCAN{
+public:
+    ConcurrencyStealingAVX2GridDBSCAN(double _eps, int _minPts);
 protected:
     void expand() override;
     void expand_helper(std::deque<int> *cells);
