@@ -52,6 +52,7 @@ This project has three milestones:
 - [x] **Naive Approach**: Implement DBSCAN using a naive approach and benchmark its performance.
 - [x] **Grid-Based Approach**: Optimize the algorithm by using a grid-based approach for neighbor search and benchmark its performance.
 - [x] **Parallelization**: Parallelize the algorithm using OpenMP to speed up computation and benchmark its performance.
+- [x] **Parallelization**: Parallelize the algorithm using C++ Concurrency API to speed up computation and benchmark its performance.
 
 ## Parallelism
 
