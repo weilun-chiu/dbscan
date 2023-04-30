@@ -142,11 +142,11 @@ As a results, we choose to implement the C++ concurrency API to check if the per
 
 We have observed that the performance of C++ concurrency is marginally better than OpenMP, but there is a significant performance drop (3x slower) when the number of threads is 32. While performance improves with more threads, it worsens when the number of threads exceeds 64, which is due to the limited number of core cells (63). When the number of threads is 32, there is extreme workload imbalance where each thread, except the last one, is assigned two core cells. However, the last thread is assigned 32 core cells. Similarly, when the number of threads exceeds 63, the last thread takes all the workload, while others have none.
 
-![alt text](https://i.imgur.com/klX6k6C.png)
+![alt text](https://i.imgur.com/klX6k6C.png "Comparison between tasked-based OpenMP and C++ Concurrency API. vertical axis is execution time, horizon axis it number of threads."))
 
 In order to tackle workload imbalances, we have introduced a work-stealing technique that allocates a task queue to every thread. This method allows the master thread to keep track of each worker thread's progress. When the master identifies a vacant task queue, it reassigns a task from a neighboring queue to the idle thread for processing. The work-stealing approach guarantees effective utilization of threads, fostering equitable workload distribution and boosting overall performance. The impact of this strategy is illustrated in the accompanying figure. While there is a minor overhead with a lower thread count, the work-stealing method outperforms other frameworks once the number of threads reaches 25 or more.
 
-![alt text](https://i.imgur.com/TOE4IJX.png)
+![alt text](https://i.imgur.com/TOE4IJX.png "Comparison between tasked-based OpenMP, C++ Concurrency API, and C++ Concurrency API with work-stealing. vertical axis is execution time, horizon axis it number of threads.")
 
 ### Conclusion
 In summary, by implementing parallelism techniques, we were able to achieve a significant 9.79x improvement in runtime. Our approach involved initially profiling the runtime and identifying performance hotspots, which accounted for 99% of the total runtime. We then utilized OpenMP to obtain a preliminary understanding of parallelism performance, followed by further optimization using the C++ Concurrency API and work-stealing mechanism.
