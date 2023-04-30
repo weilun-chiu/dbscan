@@ -60,10 +60,10 @@ This project has three milestones:
 
 | Procedure              | Runtime    | Percentage |
 | ----------------------| ---------- | -----------|
-| assignPoints           | 0.011691   | 0.9601%    |
+| assignPoints           | 0.011691   | 0.9538%    |
 | mark_ingrid_corecell   | 1.68E-06   | 0.0001%    |
-| mark_outgrid_corecell  | 0.00318535 | 0.2632%    |
-| expand                 | 1.21085    | 99.7766%   |
+| mark_outgrid_corecell  | 0.00318535 | 0.2599%    |
+| expand                 | 1.21085    | 98.7861%   |
 
 Based on the provided data, it can be observed that the "expand" procedure takes up the majority of the runtime with 99.7766%. This indicates that improving the performance of the "expand" procedure should be the primary target for optimizing the overall performance of the system.
 
