@@ -64,7 +64,7 @@ Meanwhile, the other procedures such as "assignPoints" and "mark_outgrid_corecel
 
 Therefore, optimizing the "expand" procedure is likely to yield the most significant improvements in the system's overall performance.
 
-![alt text](https://i.imgur.com/9dhLc7E.png)
+![alt text](https://i.imgur.com/cVEfCsF.png)
 
 ### OpenMP and Analysis of Parallelism Bottleneck
 Our initial attempt to parallelize the grid-based DBSCAN algorithm(n:50000, cluster:3, eps:0.2, minPts:2) showed that we achieved close to 2x speedup using 2 threads, but we didn't observe further benefits with more threads. Parallelizing grid-based DBSCAN is challenging due to load balancing, communication overhead, and maintaining correctness, but can be done with careful consideration.
