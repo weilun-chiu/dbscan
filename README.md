@@ -14,14 +14,17 @@ This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clus
 
 ## Introduction
 
-This project aims to provide an efficient and scalable implementation of DBSCAN in C++. It currently includes a naive approach and a grid-based approach, with plans to add parallelization and KDtree optimizations in future milestones.
+This project aims to provide an efficient and scalable implementation of DBSCAN in C++. It includes a naive approach and a grid-based approach, with plans to add parallelization and KDtree optimizations in future milestones.
 
 ## Usage
 
 To make use of this project, you can add the DBSCAN header file #include "dbscan.h" to your C++ project and create instances of the provided dbscan object types listed below. These objects take your data as an input parameter, and the result will be a vector containing cluster labels for every point in your dataset.
 
 * NaiveDBSCAN
-* GridDBSCAN
+* SerialGridDBSCAN
+* OMPGridDBSCAN
+* ConcurrencyGridDBSCAN
+* ConcurrencyStealingGridDBSCAN
 
 ## Example
 
