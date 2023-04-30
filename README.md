@@ -94,6 +94,13 @@ The perf stat looks normal in terms of the performance counter statistics. It pr
        0.022818000 seconds sys
 ```
 
+We further exame the another settings (eps: 0.12  minPts: 5) and observe better parallel performance.
+
+We also implement another parallel framework: C++ Concurrency API.
+
+![alt text]https://i.imgur.com/Ito9Yd8.png
+
+
 ## Futureworks
 
 One of the main drawbacks of DBSCAN in high dimensional space is the "curse of dimensionality." As the number of dimensions increases, the distance between points tends to become more uniform, and the density-based approach used by DBSCAN becomes less effective.  To overcome these limitations, KDTree can be used as an alternative approach to improve the performance of DBSCAN in high dimensional space. KDTree is a data structure that partitions data points into a tree structure based on their spatial proximity. This allows for efficient nearest neighbor searches, which are essential for density-based clustering algorithms like DBSCAN.
