@@ -122,7 +122,7 @@ The perf stat looks normal in terms of the performance counter statistics. It pr
        0.022818000 seconds sys
 ```
 
-### C++ Concurrency API and Work-Stealing Technique
+### C++ Concurrency API
 
 C++ concurrency API is a set of tools and libraries added to the C++ Standard Library to support writing concurrent and parallel code in C++. It was introduced in the C++11 standard, which was released in 2011. The API includes features like threads, mutexes, condition variables, futures, promises, and atomics, which allow developers to create and manage threads, protect shared resources, coordinate task execution, and synchronize asynchronous operations. The API is designed to be portable and efficient, but requires careful attention to detail and a good understanding of concurrency concepts.
 
@@ -144,11 +144,13 @@ We have observed that the performance of C++ concurrency is marginally better th
 
 ![alt text](https://i.imgur.com/klX6k6C.png "Comparison between tasked-based OpenMP and C++ Concurrency API. vertical axis is execution time, horizon axis it number of threads."))
 
+### Dynamic Scheduling: Work-Stealing Technique
+
 In order to tackle workload imbalances, we have introduced a work-stealing technique that allocates a task queue to every thread. This method allows the master thread to keep track of each worker thread's progress. When the master identifies a vacant task queue, it reassigns a task from a neighboring queue to the idle thread for processing. The work-stealing approach guarantees effective utilization of threads, fostering equitable workload distribution and boosting overall performance. The impact of this strategy is illustrated in the accompanying figure. While there is a minor overhead with a lower thread count, the work-stealing method outperforms other frameworks once the number of threads reaches 25 or more.
 
 ![alt text](https://i.imgur.com/TOE4IJX.png "Comparison between tasked-based OpenMP, C++ Concurrency API, and C++ Concurrency API with work-stealing. vertical axis is execution time, horizon axis it number of threads.")
 
-## Accelerating Parallel Programs with SIMD and AVX Instructions
+### Accelerating Parallel Programs with SIMD and AVX Instructions
 In our previous section, we discovered that the primary performance bottleneck in our parallel program was related to memory allocation and floating-point arithmetic operations. In an effort to further optimize our program, we turned to the study of SIMD and AVX instructions. We implemented a new version of our parallelism framework that enabled AVX instructions for the most critical floating-point arithmetic functions. As a result, we were able to achieve significant performance gains - up to 23.5x on a single thread, 35.86x on 32 threads, and 207x compared to the serial program, details can be found in the following table and figure. These results demonstrate the tremendous potential of using SIMD and AVX instructions to accelerate parallel programs, particularly those with significant floating-point arithmetic computations.
 
 | Threads | OpenMP | Concurrency + stealing | Concurrency + stealing + AVX |
