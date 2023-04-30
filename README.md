@@ -29,14 +29,20 @@ The `main.cpp` file serves as the primary example of usage, while the `test.cpp`
 
 ```C++
     // Data generations
-    DataGenerator generator(2, 1000);
+    DataGenerator generator(2, 100000);
     auto cluster_data = generator.cluster_distribution(3);
     
-    NaiveDBSCAN naive_dbscan(eps, minPts);
-    naive_dbscan.run(cluster_data);
-    
-    GridDBSCAN grid_dbscan(eps, minPts);
-    grid_dbscan.run(cluster_data);
+    SerialGridDBSCAN serial_grid_dbscan(eps, minPts);
+    serial_grid_dbscan.run(cluster_data);
+
+    OMPGridDBSCAN omp_grid_dbscan(eps, minPts);
+    omp_grid_dbscan.run(cluster_data);
+
+    ConcurrencyGridDBSCAN concurrency_grid_dbscan(eps, minPts);
+    concurrency_grid_dbscan.run(cluster_data);
+
+    ConcurrencyStealingGridDBSCAN concurrency_stealing_grid_dbscan(eps, minPts);
+    concurrency_stealing_grid_dbscan.run(cluster_data);
 ```
 
 ## Milestones
