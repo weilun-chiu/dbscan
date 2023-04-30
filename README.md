@@ -138,7 +138,7 @@ here are a few examples of what C++ concurrency can do that OpenMP cannot:
 
 Overall, the ability to finely control thread creation, synchronization, memory management, and scheduling is a key advantage of C++ concurrency over OpenMP, especially for projects that require high-performance and low-level optimization.
 
-As a results, we choose to implement the C++ concurrency API to check if the performance can be further improved. We test the performance on this environment settings:(eps: 0.12  minPts: 5, #Data: 100000). 
+As a results, we choose to implement the C++ concurrency API to check if the performance can be further improved. We test the performance on this environment settings:(n:100000, cluster:3, eps:0.12, minPts:5). 
 
 We have observed that the performance of C++ concurrency is marginally better than OpenMP, but there is a significant performance drop (3x slower) when the number of threads is 32. While performance improves with more threads, it worsens when the number of threads exceeds 64, which is due to the limited number of core cells (63). When the number of threads is 32, there is extreme workload imbalance where each thread, except the last one, is assigned two core cells. However, the last thread is assigned 32 core cells. Similarly, when the number of threads exceeds 63, the last thread takes all the workload, while others have none.
 
