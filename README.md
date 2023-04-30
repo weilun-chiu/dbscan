@@ -145,7 +145,7 @@ In order to tackle workload imbalances, we have introduced a work-stealing techn
 
 ![alt text](https://i.imgur.com/TOE4IJX.png)
 
-### Summerize
+### Conclusion
 In summary, by implementing parallelism techniques, we were able to achieve a significant 9.79x improvement in runtime. Our approach involved initially profiling the runtime and identifying performance hotspots, which accounted for 99% of the total runtime. We then utilized OpenMP to obtain a preliminary understanding of parallelism performance, followed by further optimization using the C++ Concurrency API and work-stealing mechanism.
 
 ## Futureworks
