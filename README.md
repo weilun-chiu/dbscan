@@ -149,7 +149,17 @@ In order to tackle workload imbalances, we have introduced a work-stealing techn
 ![alt text](https://i.imgur.com/TOE4IJX.png "Comparison between tasked-based OpenMP, C++ Concurrency API, and C++ Concurrency API with work-stealing. vertical axis is execution time, horizon axis it number of threads.")
 
 ## Accelerating Parallel Programs with SIMD and AVX Instructions
-In our previous section, we discovered that the primary performance bottleneck in our parallel program was related to memory allocation and floating-point arithmetic operations. In an effort to further optimize our program, we turned to the study of SIMD and AVX instructions. We implemented a new version of our parallelism framework that enabled AVX instructions for the most critical floating-point arithmetic functions. As a result, we were able to achieve significant performance gains - up to 23.5x on a single thread, 35.86x on 32 threads, and 207x compared to the serial program, details can be found in the following figure. These results demonstrate the tremendous potential of using SIMD and AVX instructions to accelerate parallel programs, particularly those with significant floating-point arithmetic computations.
+In our previous section, we discovered that the primary performance bottleneck in our parallel program was related to memory allocation and floating-point arithmetic operations. In an effort to further optimize our program, we turned to the study of SIMD and AVX instructions. We implemented a new version of our parallelism framework that enabled AVX instructions for the most critical floating-point arithmetic functions. As a result, we were able to achieve significant performance gains - up to 23.5x on a single thread, 35.86x on 32 threads, and 207x compared to the serial program, details can be found in the following table and figure. These results demonstrate the tremendous potential of using SIMD and AVX instructions to accelerate parallel programs, particularly those with significant floating-point arithmetic computations.
+
+| Threads | OpenMP | Concurrency + stealing | Concurrency + stealing + AVX |
+|---------|--------|------------------------|------------------------------|
+| 1       | 131.786 | 129.61                 | 5.51029                      |
+| 4       | 65.8315 | 44.5775                | 1.69275                      |
+| 8       | 34.6415 | 37.3069                | 1.14452                      |
+| 16      | 26.2514 | 33.0382                | 1.02039                      |
+| 32      | 25.5065 | 23.1522                | 0.645475                     |
+| 64      | 23.1934 | 23.4187                | 0.867214                     |
+| 72      | 22.9655 | 22.7817                | 0.888835                     |
 
 ![alt text](https://i.imgur.com/Ee581B6.png "Comparison between tasked-based OpenMP, C++ Concurrency API with work-stealing, and C++ Concurrency API with work-stealing and AVX instructions. vertical axis is execution time, horizon axis it number of threads.")
 
