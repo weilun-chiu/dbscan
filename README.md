@@ -145,6 +145,9 @@ In order to tackle workload imbalances, we have introduced a work-stealing techn
 
 ![alt text](https://i.imgur.com/TOE4IJX.png)
 
+### Summerize
+In summary, by implementing parallelism techniques, we were able to achieve a significant 9.79x improvement in runtime. Our approach involved initially profiling the runtime and identifying performance hotspots, which accounted for 99% of the total runtime. We then utilized OpenMP to obtain a preliminary understanding of parallelism performance, followed by further optimization using the C++ Concurrency API and work-stealing mechanism.
+
 ## Futureworks
 
 One of the main drawbacks of DBSCAN in high dimensional space is the "curse of dimensionality." As the number of dimensions increases, the distance between points tends to become more uniform, and the density-based approach used by DBSCAN becomes less effective.  To overcome these limitations, KDTree can be used as an alternative approach to improve the performance of DBSCAN in high dimensional space. KDTree is a data structure that partitions data points into a tree structure based on their spatial proximity. This allows for efficient nearest neighbor searches, which are essential for density-based clustering algorithms like DBSCAN.
