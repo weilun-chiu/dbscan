@@ -114,11 +114,23 @@ The perf stat looks normal in terms of the performance counter statistics. It pr
 
 ### C++ Concurrency API and Work Stealing
 
-We further exame the another settings (eps: 0.12  minPts: 5) and observe better parallel performance.
-We also implement another parallel framework: C++ Concurrency API.
+C++ concurrency API is a set of tools and libraries added to the C++ Standard Library to support writing concurrent and parallel code in C++. It was introduced in the C++11 standard, which was released in 2011. The API includes features like threads, mutexes, condition variables, futures, promises, and atomics, which allow developers to create and manage threads, protect shared resources, coordinate task execution, and synchronize asynchronous operations. The API is designed to be portable and efficient, but requires careful attention to detail and a good understanding of concurrency concepts.
+
+here are a few examples of what C++ concurrency can do that OpenMP cannot:
+
+- Fine-grained control over thread creation and management: C++ concurrency allows developers to create and manage threads at a lower level of abstraction than OpenMP. This can be useful when a project requires fine-tuned control over the number of threads created, the affinity of threads to specific cores, or the lifecycle of threads.
+
+- Custom synchronization primitives: C++ concurrency provides a rich set of synchronization primitives, such as mutexes, condition variables, and semaphores, which can be used to protect shared resources and coordinate the execution of tasks. These primitives offer more flexibility and control than the OpenMP synchronization constructs, which are based on atomic operations and barriers.
+
+- Custom memory management: C++ concurrency allows developers to customize the memory allocation and deallocation strategies used by their concurrent code. This can be useful when a project needs to optimize memory usage or avoid contention on shared memory pools.
+
+- Custom scheduling policies: C++ concurrency provides a flexible framework for implementing custom thread scheduling policies, which can be used to optimize the performance of specific applications or workloads. OpenMP, in contrast, provides a fixed set of scheduling policies that may not be optimal for all situations.
+
+Overall, the ability to finely control thread creation, synchronization, memory management, and scheduling is a key advantage of C++ concurrency over OpenMP, especially for projects that require high-performance and low-level optimization.
+
+As a results, we choose to implement the C++ concurrency API to check if the performance can be further improved. We test the performance on this environment settings:(eps: 0.12  minPts: 5, #Data: 100000).
 
 ![alt text](https://i.imgur.com/Ito9Yd8.png)
-
 
 ## Futureworks
 
