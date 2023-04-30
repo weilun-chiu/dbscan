@@ -49,7 +49,7 @@ This project has three milestones:
 
 ## Parallelism
 
-Serial Runtime Analysis
+### Serial Runtime Analysis
 
 | Procedure              | Runtime    | Percentage |
 | ----------------------| ---------- | -----------|
@@ -58,7 +58,15 @@ Serial Runtime Analysis
 | mark_outgrid_corecell  | 0.00318535 | 0.2632%    |
 | expand                 | 1.21085    | 99.7766%   |
 
+Based on the provided data, it can be observed that the "expand" procedure takes up the majority of the runtime with 99.7766%. This indicates that improving the performance of the "expand" procedure should be the primary target for optimizing the overall performance of the system.
 
+Meanwhile, the other procedures such as "assignPoints" and "mark_outgrid_corecell" take up a relatively small portion of the runtime, at 0.9601% and 0.2632% respectively. The "mark_ingrid_corecell" procedure takes up a negligible amount of runtime at 0.0001%.
+
+Therefore, optimizing the "expand" procedure is likely to yield the most significant improvements in the system's overall performance.
+
+![alt text](https://i.imgur.com/9dhLc7E.png)
+
+### OpenMP and Analysis of Parallelism Bottleneck
 Our initial attempt to parallelize the grid-based DBSCAN algorithm(n:50000, cluster:3, eps:0.2, minPts:2) showed that we achieved close to 2x speedup using 2 threads, but we didn't observe further benefits with more threads. Parallelizing grid-based DBSCAN is challenging due to load balancing, communication overhead, and maintaining correctness, but can be done with careful consideration.
 
 ![alt text](https://i.imgur.com/Qk3rBbz.png)
@@ -104,8 +112,9 @@ The perf stat looks normal in terms of the performance counter statistics. It pr
        0.022818000 seconds sys
 ```
 
-We further exame the another settings (eps: 0.12  minPts: 5) and observe better parallel performance.
+### C++ Concurrency API and Work Stealing
 
+We further exame the another settings (eps: 0.12  minPts: 5) and observe better parallel performance.
 We also implement another parallel framework: C++ Concurrency API.
 
 ![alt text](https://i.imgur.com/Ito9Yd8.png)
