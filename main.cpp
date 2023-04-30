@@ -13,7 +13,17 @@ int main(int argc, char* argv[]) {
     auto cluster_data = generator.cluster_distribution(3);
     // auto uneven_data = generator.uneven_distribution(3, 1);
     // Grid DBSCAN
-    GridDBSCAN grid_dbscan(eps, minPts);
-    grid_dbscan.run(cluster_data);
+    SerialGridDBSCAN serial_grid_dbscan(eps, minPts);
+    serial_grid_dbscan.run(cluster_data);
+
+    OMPGridDBSCAN omp_grid_dbscan(eps, minPts);
+    omp_grid_dbscan.run(cluster_data);
+
+    ConcurrencyGridDBSCAN concurrency_grid_dbscan(eps, minPts);
+    concurrency_grid_dbscan.run(cluster_data);
+
+    ConcurrencyStealingGridDBSCAN concurrency_stealing_grid_dbscan(eps, minPts);
+    concurrency_stealing_grid_dbscan.run(cluster_data);
+    
     return 0;
 }
