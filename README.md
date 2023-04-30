@@ -74,13 +74,13 @@ Meanwhile, the other procedures such as "assignPoints" and "mark_outgrid_corecel
 
 Therefore, optimizing the "expand" procedure is likely to yield the most significant improvements in the system's overall performance.
 
-![alt text](https://i.imgur.com/cVEfCsF.png)
+![alt text](https://i.imgur.com/cVEfCsF.png "Serial Runtime Profiling")
 
 ### OpenMP and Analysis of Parallelism Bottleneck
 Our initial attempt to parallelize the grid-based DBSCAN algorithm(n:50000, cluster:3, eps:0.2, minPts:2) showed that we achieved close to 2x speedup using 2 threads, but we didn't observe further benefits with more threads. Parallelizing grid-based DBSCAN is challenging due to load balancing, communication overhead, and maintaining correctness, but can be done with careful consideration.
 
-![alt text](https://i.imgur.com/Qk3rBbz.png)
-![alt text](https://i.imgur.com/Xy2ul3G.png)
+![alt text](https://i.imgur.com/Qk3rBbz.png "Loop-based Parallism on OpenMP. vertical axis is execution time, horizon axis it number of threads.")
+![alt text](https://i.imgur.com/Xy2ul3G.png "Task-based Parallism on OpenMP. vertical axis is execution time, horizon axis it number of threads.")
 
 This perf report shows the percentage of CPU cycles spent on different functions during the execution of the dbscan program. The dist function in the dbscan code accounts for 27.50% of the CPU cycles. The malloc function in the libc library accounts for 29.23% of the CPU cycles, followed by _int_free and isConnect. The report also shows that the operator new function in the libstdc++ library and the cfree function in the libc library account for a significant portion of the CPU cycles. This suggests that memory allocation and deallocation may be a bottleneck in the program's performance.
 
