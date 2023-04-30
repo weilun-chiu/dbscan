@@ -56,7 +56,7 @@ This project has three milestones:
 
 ## Parallelism
 
-### Serial Runtime Analysis
+### Optimizing Performance: Addressing the 99% Execution Time in 1% of the Code
 
 | Procedure              | Runtime    | Percentage |
 | ----------------------| ---------- | -----------|
