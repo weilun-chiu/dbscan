@@ -154,17 +154,17 @@ In order to tackle workload imbalances, we have introduced a work-stealing techn
 In our previous section, we discovered that the primary performance bottleneck in our parallel program was related to memory allocation and floating-point arithmetic operations. In an effort to further optimize our program, we turned to the study of SIMD and AVX instructions. We implemented a new version of our parallelism framework that enabled AVX instructions for the most critical floating-point arithmetic functions. We test the performance on this environment settings:(n:1000000, cluster:3, eps:0.12, minPts:5). The results demonstrate that we were able to achieve significant performance gains - up to 23.5x on a single thread, 35.86x on 32 threads, and 207x compared to the serial program, details can be found in the following table and figure. These results demonstrate the tremendous potential of using SIMD and AVX instructions to accelerate parallel programs, particularly those with significant floating-point arithmetic computations.
 
 | Threads | OpenMP | Concurrency + stealing | Concurrency + stealing + AVX |
-|---------|--------|-----------------------|------------------------------|
-| 1       | 131.786 (1.01x) | 129.61 (1.03x) | 5.51 (24.32x) |
-| 4       | 65.8315 (2.04x) | 44.5775 (3.01x) | 1.69 (79.16x) |
-| 8       | 34.6415 (3.87x) | 37.3069 (3.59x) | 1.14 (117.08x) |
-| 16      | 26.2514 (5.10x) | 33.0382 (4.06x) | 1.02 (131.32x) |
-| 32      | 25.5065 (5.25x) | 23.1522 (5.79x) | 0.65 (207.60x) |
-| 64      | 23.1934 (5.78x) | 23.4187 (5.72x) | 0.87 (154.52x) |
-| 72      | 22.9655 (5.83x) | 22.7817 (5.88x) | 0.89 (150.76x) |
+|---------|----------------------|---------------------------------------|--------------------------------------------|
+| 1       | 60.5908 (0.99)    | 59.9386 (1.00)                      | 33.683 (1.78)                           |
+| 4       | 45.5341 (1.32)    | 25.7059 (2.33)                      | 11.5379 (5.20)                          |
+| 8       | 24.6547 (2.43)    | 16.8995 (3.55)                      | 6.08641 (9.86)                          |
+| 16      | 19.4427 (3.09)    | 15.2388 (3.94)                      | 5.57829 (10.76)                         |
+| 32      | 20.3203 (2.95)    | 16.4425 (3.65)                      | 4.69244 (12.79)                         |
+| 64      | 17.8841 (3.35)    | 16.1772 (3.71)                      | 5.05127 (11.88)                         |
+| 78      | 19.089 (3.14)     | 15.9645 (3.76)                      | 4.80074 (12.50)                         |
 
 
-![alt text](https://i.imgur.com/Ee581B6.png "Comparison between tasked-based OpenMP, C++ Concurrency API with work-stealing, and C++ Concurrency API with work-stealing and AVX instructions. vertical axis is execution time, horizon axis it number of threads.")
+![alt text](https://i.imgur.com/0Ogmi3Y.png "Comparison between tasked-based OpenMP, C++ Concurrency API with work-stealing, and C++ Concurrency API with work-stealing and AVX instructions. vertical axis is execution time, horizon axis it number of threads.")
 
 ### Conclusion
 In summary, we were able to achieve a remarkable 9.79x improvement in runtime through our implementation of parallelism techniques, which involved identifying and optimizing performance hotspots that accounted for 99% of the total runtime. Our approach included profiling the runtime, using OpenMP for initial parallelism performance, and optimizing further with the C++ Concurrency API and work-stealing mechanism. Additionally, we explored the use of SIMD and AVX instructions to further accelerate the most critical floating-point arithmetic functions, which led to significant performance gains of up to 23.5x on a single thread, 35.86x on 32 threads, and 207x compared to the serial program.
