@@ -5,6 +5,7 @@
 #include <functional>
 #include <numeric>
 #include <deque>
+#include <atomic>
 
 #include "point.h"
 
@@ -36,7 +37,7 @@ public:
     }
     
     void setup(int n) {
-        parent.resize(n, 0);
+        parent = std::vector<std::atomic<int>>(n);
         std::iota(parent.begin(), parent.end(), 0);
     }
 
@@ -49,15 +50,24 @@ public:
     
     void unite(int x, int y) {
         int root_x = find(x);
-        while (y != parent[y]) {
-            int next = parent[y];
-            parent[y] = root_x;
-            y = next;
+        int root_y = find(y);
+        while (root_x != root_y) {
+            if (root_x < root_y) {
+                if (std::atomic_compare_exchange_strong(&parent[root_y], &root_y, root_x)) {
+                    break;
+                }
+            } else {
+                if (std::atomic_compare_exchange_strong(&parent[root_x], &root_x, root_y)) {
+                    break;
+                }
+            }
+            root_x = find(x);
+            root_y = find(y);
         }
     }
 
 private:
-    std::vector<int> parent;
+    std::vector<std::atomic<int>> parent;
 };
 
 class GridDBSCAN : public DBSCAN{
