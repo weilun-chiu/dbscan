@@ -33,17 +33,21 @@ class UnionFind {
 public:
     UnionFind() {}
     UnionFind(int n) : parent(n) {
-        std::iota(parent.begin(), parent.end(), 0);
+        for (int i = 0; i < n; i++) {
+            parent[i].store(i, std::memory_order_relaxed);
+        }
     }
     
     void setup(int n) {
         parent = std::vector<std::atomic<int>>(n);
-        std::iota(parent.begin(), parent.end(), 0);
+        for (int i = 0; i < n; i++) {
+            parent[i].store(i, std::memory_order_relaxed);
+        }
     }
 
     int find(int x) {
-        while (x != parent[x]) {
-            x = parent[x];
+        while (x != parent[x].load(std::memory_order_relaxed)) {
+            x = parent[x].load(std::memory_order_relaxed);
         }
         return x;
     }
@@ -53,11 +57,11 @@ public:
         int root_y = find(y);
         while (root_x != root_y) {
             if (root_x < root_y) {
-                if (std::atomic_compare_exchange_strong(&parent[root_y], &root_y, root_x)) {
+                if (parent[root_y].compare_exchange_strong(root_y, root_x, std::memory_order_relaxed)) {
                     break;
                 }
             } else {
-                if (std::atomic_compare_exchange_strong(&parent[root_x], &root_x, root_y)) {
+                if (parent[root_x].compare_exchange_strong(root_x, root_y, std::memory_order_relaxed)) {
                     break;
                 }
             }
