@@ -34,19 +34,23 @@ public:
     UnionFind() {}
     UnionFind(int n) : parent(n) {
         for (int i = 0; i < n; i++) {
-            parent[i].store(i, std::memory_order_relaxed);
+            parent[i].store(-1, std::memory_order_relaxed);
         }
     }
     
     void setup(int n) {
         parent = std::vector<std::atomic<int>>(n);
         for (int i = 0; i < n; i++) {
-            parent[i].store(i, std::memory_order_relaxed);
+            parent[i].store(-1, std::memory_order_relaxed);
         }
     }
 
     int find(int x) {
         while (x != parent[x].load(std::memory_order_relaxed)) {
+            if (parent[x].load(std::memory_order_relaxed) == -1) {
+                parent[x].store(x, std::memory_order_relaxed);
+                return x;
+            }
             x = parent[x].load(std::memory_order_relaxed);
         }
         return x;
@@ -68,6 +72,18 @@ public:
             root_x = find(x);
             root_y = find(y);
         }
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const UnionFind& uf) {
+        os << "[";
+        for (int i = 0; i < uf.parent.size(); i++) {
+            os << uf.parent[i].load(std::memory_order_relaxed);
+            if (i != uf.parent.size() - 1) {
+                os << ", ";
+            }
+        }
+        os << "]";
+        return os;
     }
 
 private:
@@ -94,7 +110,7 @@ protected:
     void mark_ingrid_corecell();
     void mark_outgrid_corecell();
     virtual void expand() = 0;
-    std::vector<int> getClusterResults();
+    std::vector<int> getClusterResults(std::vector<Point> const&);
     std::vector<int> findNeighbor(int i);
     bool mark_outgrid_corecell_helper(int i);
     void _expand_helper(int i);

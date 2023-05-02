@@ -132,8 +132,8 @@ std::vector<int> getNeighborIndices(std::vector<int> const& index, std::vector<i
     } else if (Point::dimensionality == 2) {
         for (int i = std::max(0,index[0]-2); i < std::min(index[0]+3, gridSize[0]); i++) {
             for (int j = std::max(0,index[1]-2); j < std::min(index[1]+3, gridSize[0]); j++) {
-                if ((abs(i)+abs(j)) == 4) continue;
-                if ((i == 0) && (j == 0)) continue;
+                if ((abs(i-index[0])+abs(j-index[1])) == 4) continue;
+                if ((i == index[0]) && (j == index[1])) continue;
                 res.push_back((i)*gridSize[0]+(j));
             }
         }
@@ -283,12 +283,16 @@ void ConcurrencyStealingGridDBSCAN::expand() {
     }
 }
 
-std::vector<int> GridDBSCAN::getClusterResults () {
+std::vector<int> GridDBSCAN::getClusterResults(std::vector<Point> const& points) {
     std::vector<int> pointsCluster(npoints, -1);
-    for (int i=0; i<gridSize1D; i++) {
-        for (const auto& g: grid[i]) {
-            pointsCluster[g.id] = uf.find(cluster[i]);
-        }
+    for (auto const& p: points) {
+        std::vector<int> index(Point::dimensionality);
+        double _gridCellSize = gridCellSize;
+        std::transform(p.coords.begin(), p.coords.end(), index.begin(), [_gridCellSize](double x) {
+            return static_cast<int>(x / _gridCellSize);
+        });
+        int GridIndex1D(kDTo1DIdx(index, gridSize));
+        pointsCluster[p.id] = uf.find(GridIndex1D);
     }
     return pointsCluster;
 }
@@ -334,6 +338,7 @@ void GridDBSCAN::_expand_helper(int i) {
 }
 
 void GridDBSCAN::expand_helper(int i) {
+    uf.find(i);
     std::vector<int> neighbors=findNeighbor(i);
     for (auto& ni:neighbors) {
         if (isConnect(grid[i], grid[ni], eps)) {
@@ -361,6 +366,7 @@ void ConcurrencyGridDBSCAN::expand_helper(int lo, int hi) {
 void ConcurrencyStealingGridDBSCAN::expand_helper(std::deque<int> *cells) {
     while (!cells->empty()) {
         int cell_index = cells->front();
+        uf.find(cell_index);
         cells->pop_front();
         std::vector<int> neighbors = findNeighbor(cell_index);
         for (auto neighbor_index : neighbors) {
@@ -430,7 +436,7 @@ std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const& points) 
     std::chrono::duration<double> elapsed = end - start;
     std::cout << "Elapsed time: " << elapsed.count() << " seconds." << '\n';
     
-    std::vector<int> pointsCluster = getClusterResults();
+    std::vector<int> pointsCluster = getClusterResults(points);
     return pointsCluster;
 }
 
@@ -484,8 +490,6 @@ std::vector<int> kdtree_dbscan(std::vector<Point> const& points, double eps, int
 }
 
 void print_clusters(std::vector<Point> const& points, std::vector<int> const& cluster) {
-    int clusterCount = *std::max_element(cluster.begin(), cluster.end()) + 1;
-    std::cout << "Clusters: " << clusterCount << '\n';
     for (int i = 0; i < points.size(); i++) {
         std::cout << "(";
         for (int j = 0; j < points[i].coords.size(); j++) {
