@@ -1,6 +1,6 @@
 # C++ Parallelized Grid-based DBSCAN 
 
-This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clustering of Applications with Noise), a popular clustering algorithm used in machine learning.
+This project provides an optimized implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN) algorithm in C++. DBSCAN is a popular unsupervised machine learning algorithm used for clustering and outlier detection. The project includes a naive approach and a grid-based approach, and utilizes parallelism to improve the algorithm's performance.
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ This project provides a C++ implementation of DBSCAN (Density-Based Spatial Clus
 
 ## Introduction
 
-This project aims to provide an efficient and scalable implementation of DBSCAN in C++. It includes a naive approach and a grid-based approach, with plans to add parallelization and KDtree optimizations in future milestones.
+The aim of this project is to provide an efficient and scalable implementation of the DBSCAN algorithm in C++. The grid-based approach is optimized by using a 2D grid to index data points and speeding up the neighbor search process. Parallelism is utilized to accelerate the algorithm's performance, including OpenMP and C++ Concurrency API. Additionally, we have used AVX instructions to optimize floating-point arithmetic operations in the program.
 
 ## Usage
 
