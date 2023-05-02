@@ -239,9 +239,12 @@ void ConcurrencyGridDBSCAN::expand() {
     }
 }
 
+std::vector<std::mutex> work_queue_mutex;
+
 void ConcurrencyStealingGridDBSCAN::expand() {
     std::vector<std::future<void>> futures;
     int num_threads = get_number_of_threads();
+    work_queue_mutex = std::vector<std::mutex>(num_threads);
 
     std::deque<int> tasks;
     for (int i = 0; i < corecell_set.size(); i++) {
@@ -255,27 +258,9 @@ void ConcurrencyStealingGridDBSCAN::expand() {
     }
 
     for (int i = 0; i < num_threads; i++) {
-        using helper_func_t = void (ConcurrencyStealingGridDBSCAN::*)(std::deque<int>*);
+        using helper_func_t = void (ConcurrencyStealingGridDBSCAN::*)(std::deque<int>*, int, std::deque<int>*, int);
         helper_func_t helper_func_ptr = &ConcurrencyStealingGridDBSCAN::expand_helper;
-        futures.push_back(std::async(std::launch::async, helper_func_ptr, this, &work[i]));
-    }
-
-    while (!tasks.empty()) {
-        bool allDone = true;
-        for (int i = 0; i < num_threads; i++) {
-            if (!work[i].empty()) {
-                allDone = false;
-                if (tasks.empty()) {
-                    continue;
-                }
-                int stolenWork = tasks.back();
-                tasks.pop_back();
-                work[i].push_back(stolenWork);
-            }
-        }
-        if (allDone) {
-            break;
-        }
+        futures.push_back(std::async(std::launch::async, helper_func_ptr, this, &work[i], i, &work[(i+1)%num_threads], (i+1)%num_threads));
     }
 
     for (auto &future : futures) {
@@ -363,11 +348,38 @@ void ConcurrencyGridDBSCAN::expand_helper(int lo, int hi) {
     }
 }
 
-void ConcurrencyStealingGridDBSCAN::expand_helper(std::deque<int> *cells) {
+void ConcurrencyStealingGridDBSCAN::expand_helper(std::deque<int> *cells, int tid, std::deque<int> *neighbor, int nid) {
     while (!cells->empty()) {
+        std::unique_lock<std::mutex> lock(work_queue_mutex[tid]);
+        if (cells->empty()) {
+            lock.unlock();
+            break;
+        }
         int cell_index = cells->front();
-        uf.find(cell_index);
         cells->pop_front();
+        lock.unlock();
+
+        uf.find(cell_index);
+        std::vector<int> neighbors = findNeighbor(cell_index);
+        for (auto neighbor_index : neighbors) {
+            if (isConnect(grid[cell_index], grid[neighbor_index], eps)) {
+                if (cell_index > neighbor_index) {
+                    uf.unite(cell_index, neighbor_index);
+                }
+            }
+        }
+    }
+    while (!neighbor->empty()) {
+        std::unique_lock<std::mutex> lock(work_queue_mutex[nid]);
+        if (neighbor->empty()) {
+            lock.unlock();
+            break;
+        }
+        int cell_index = neighbor->front();
+        neighbor->pop_front();
+        lock.unlock();
+
+        uf.find(cell_index);
         std::vector<int> neighbors = findNeighbor(cell_index);
         for (auto neighbor_index : neighbors) {
             if (isConnect(grid[cell_index], grid[neighbor_index], eps)) {
@@ -568,6 +580,7 @@ ConcurrencyStealingAVX2GridDBSCAN::ConcurrencyStealingAVX2GridDBSCAN(double _eps
 void ConcurrencyStealingAVX2GridDBSCAN::expand() {
     std::vector<std::future<void>> futures;
     int num_threads = get_number_of_threads();
+    work_queue_mutex = std::vector<std::mutex>(num_threads);
 
     std::deque<int> tasks;
     for (int i = 0; i < corecell_set.size(); i++) {
@@ -581,27 +594,9 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand() {
     }
 
     for (int i = 0; i < num_threads; i++) {
-        using helper_func_t = void (ConcurrencyStealingAVX2GridDBSCAN::*)(std::deque<int>*);
+        using helper_func_t = void (ConcurrencyStealingAVX2GridDBSCAN::*)(std::deque<int>*, int, std::deque<int>*, int);
         helper_func_t helper_func_ptr = &ConcurrencyStealingAVX2GridDBSCAN::expand_helper;
-        futures.push_back(std::async(std::launch::async, helper_func_ptr, this, &work[i]));
-    }
-
-    while (!tasks.empty()) {
-        bool allDone = true;
-        for (int i = 0; i < num_threads; i++) {
-            if (!work[i].empty()) {
-                allDone = false;
-                if (tasks.empty()) {
-                    continue;
-                }
-                int stolenWork = tasks.back();
-                tasks.pop_back();
-                work[i].push_back(stolenWork);
-            }
-        }
-        if (allDone) {
-            break;
-        }
+        futures.push_back(std::async(std::launch::async, helper_func_ptr, this, &work[i], i, &work[(i+1)%num_threads], (i+1)%num_threads));
     }
 
     for (auto &future : futures) {
@@ -609,10 +604,39 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand() {
     }
 }
 
-void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells) {
+void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells, int tid, std::deque<int> *neighbor, int nid) {
+// void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells) {
     while (!cells->empty()) {
+        std::unique_lock<std::mutex> lock(work_queue_mutex[tid]);
+        if (cells->empty()) {
+            lock.unlock();
+            break;
+        }
         int cell_index = cells->front();
         cells->pop_front();
+        lock.unlock();
+
+        uf.find(cell_index);
+        std::vector<int> neighbors = findNeighbor(cell_index);
+        for (auto neighbor_index : neighbors) {
+            if (isConnect_AVX(grid[cell_index], grid[neighbor_index], eps)) {
+                if (cell_index > neighbor_index) {
+                    uf.unite(cell_index, neighbor_index);
+                }
+            }
+        }
+    }
+    while (!neighbor->empty()) {
+        std::unique_lock<std::mutex> lock(work_queue_mutex[nid]);
+        if (neighbor->empty()) {
+            lock.unlock();
+            break;
+        }
+        int cell_index = neighbor->front();
+        neighbor->pop_front();
+        lock.unlock();
+
+        uf.find(cell_index);
         std::vector<int> neighbors = findNeighbor(cell_index);
         for (auto neighbor_index : neighbors) {
             if (isConnect_AVX(grid[cell_index], grid[neighbor_index], eps)) {
@@ -623,4 +647,3 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells) {
         }
     }
 }
-

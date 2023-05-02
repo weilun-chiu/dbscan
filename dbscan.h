@@ -146,7 +146,7 @@ public:
     ConcurrencyStealingGridDBSCAN(double _eps, int _minPts);
 protected:
     void expand() override;
-    void expand_helper(std::deque<int> *cells);
+    void expand_helper(std::deque<int> *cells, int tid, std::deque<int> *neighbor, int nid);
 };
 
 class ConcurrencyStealingAVX2GridDBSCAN : public GridDBSCAN{
@@ -154,5 +154,5 @@ public:
     ConcurrencyStealingAVX2GridDBSCAN(double _eps, int _minPts);
 protected:
     void expand() override;
-    void expand_helper(std::deque<int> *cells);
+    void expand_helper(std::deque<int> *cells, int tid, std::deque<int> *neighbor, int nid);
 };
