@@ -25,6 +25,7 @@ To make use of this project, you can add the DBSCAN header file #include "dbscan
 * OMPGridDBSCAN
 * ConcurrencyGridDBSCAN
 * ConcurrencyStealingGridDBSCAN
+* ConcurrencyStealingAVX2GridDBSCAN
 
 ## Example
 
