@@ -21,17 +21,6 @@ double dist(std::vector<double> const& lhs, std::vector<double> const& rhs) {
     return sqrt(dist2(lhs, rhs));
 }
 
-std::tuple<double, int> parseDBSCANArguments(int argc, char * argv[]) {
-    double eps{0.12};
-    int minPts{5};
-    if (argc == 3) {
-        eps = std::stof(argv[1]);
-        minPts = std::stoi(argv[2]);
-    }
-    std::cout << "eps: " << eps << "  minPts: " << minPts << '\n';
-    return {eps, minPts};
-}
-
 std::tuple<std::vector<double>, std::vector<double>> calculateMinMaxValues(std::vector<Point> const& points) {
     std::vector<double> max_values(Point::dimensionality, std::numeric_limits<double>::min());
     std::vector<double> min_values(Point::dimensionality, std::numeric_limits<double>::max());
