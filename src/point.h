@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: put the definition on .cpp file
+
 #include <vector>
 #include <stdexcept>
 #include <cmath>
