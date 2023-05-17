@@ -112,14 +112,14 @@ public:
     double operator[](int i) const{
         return coords[i];
     }
-    Point& operator=(Point rhs) {
+    Point& operator=(Point rhs) noexcept {
         std::swap(coords, rhs.coords);
         label = rhs.label;
         id = rhs.id;
         cluster_label = rhs.cluster_label;
         return *this;
     }
-    void operator=(std::vector<double> rhs) {
+    void operator=(std::vector<double> rhs) noexcept {
         std::swap(coords, rhs);
     }
     bool operator==(std::vector<double> const& rhs) const{
