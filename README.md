@@ -180,3 +180,8 @@ One of the main drawbacks of DBSCAN in high dimensional space is the "curse of d
 ## Contributing
 
 We welcome contributions to this project! If you would like to contribute, please submit a pull request with your changes.
+
+## Log
+### 5/16/2023:
+We plan to develop the KDTree in another repository. As a result, we remove the original kdtree files.
+Add const
