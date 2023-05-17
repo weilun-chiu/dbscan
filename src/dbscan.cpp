@@ -18,7 +18,6 @@
 
 #include "utils.h"
 #include "point.h"
-#include "kdtree.h"
 #include "dbscan.h"
 
 #include <omp.h>
@@ -450,55 +449,6 @@ std::vector<int> GridDBSCAN::dbscan_algorithm(std::vector<Point> const& points) 
     
     std::vector<int> pointsCluster = getClusterResults(points);
     return pointsCluster;
-}
-
-std::vector<int> kdtree_dbscan(std::vector<Point> const& points, double eps, int minPts) {
-    std::vector<int> visited(points.size(), 0);
-    std::vector<int> cluster(points.size(), -1);
-    int clusterIdx = 0;
-
-    KDTree kdtree(points);
-
-    for (int i = 0; i < points.size(); i++) {
-        if (visited[i]) continue;
-        visited[points[i].id] = true;
-
-        std::vector<int> neighborIdxs = kdtree.search(points[i], eps);
-        auto it = neighborIdxs.begin();
-        while (it != neighborIdxs.end()) {
-            auto p(points[*it]);
-            if (dist(points[i], p) > eps) {
-                neighborIdxs.erase(it);
-            } else {
-                it++;
-            }
-        }
-
-        if (neighborIdxs.size() < minPts) {
-            cluster[i] = -1;
-        } else {
-            cluster[i] = clusterIdx;
-            for (auto & neighbor : neighborIdxs) {
-                if (visited[neighbor] == false) {
-                    visited[neighbor] = true;
-                    std::vector<int> subNeighborIdxs = kdtree.search(points[neighbor], eps);
-                    if (subNeighborIdxs.size() >= minPts) {
-                        for (auto &sp : subNeighborIdxs) {
-                            if (visited[sp] == true)
-                                continue;
-                            visited[sp] = true;
-                            neighborIdxs.push_back(sp);
-                        }
-                    }
-                }
-                if (cluster[neighbor] == -1) {
-                    cluster[neighbor] = clusterIdx;
-                }
-            }
-            clusterIdx++;
-        }
-    }
-    return cluster;
 }
 
 void print_clusters(std::vector<Point> const& points, std::vector<int> const& cluster) {

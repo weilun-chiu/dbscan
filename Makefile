@@ -18,7 +18,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
 	mkdir -p $(BUILDDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILDDIR)/main.o: main.cpp $(SRCDIR)/utils.cpp $(SRCDIR)/point.cpp $(SRCDIR)/kdtree.cpp $(SRCDIR)/dbscan.cpp
+$(BUILDDIR)/main.o: main.cpp $(SRCDIR)/utils.cpp $(SRCDIR)/point.cpp $(SRCDIR)/dbscan.cpp
 	mkdir -p $(BUILDDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
