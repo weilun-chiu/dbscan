@@ -68,6 +68,6 @@ public:
     }
 
 private:
-    int k_;
-    int n_;
+    const int k_;
+    const int n_;
 };
