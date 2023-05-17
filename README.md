@@ -185,3 +185,4 @@ We welcome contributions to this project! If you would like to contribute, pleas
 - 5/16/2023:
     - We plan to develop the KDTree in another repository. As a result, we remove the original kdtree files.
     - Add const.
+    - Add noexcept.
