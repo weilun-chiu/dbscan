@@ -1,6 +1,7 @@
 #pragma once
 
-// TODO: put the definition on .cpp file
+// TODO: 
+// 1. put the definition on .cpp file
 
 #include <vector>
 #include <stdexcept>
@@ -26,29 +27,29 @@ public:
     };
     Point() {};
 
-    static void resetDimension() {dimensionality = 0;}
-    static void setDimension(size_t d) {dimensionality = d;}
+    static void resetDimension() noexcept {dimensionality = 0;}
+    static void setDimension(size_t d) noexcept {dimensionality = d;}
 
     // Overloads
-    auto begin() const {
+    auto begin() const noexcept {
         return coords.begin();
     }
-    auto end() const {
+    auto end() const noexcept {
         return coords.end();
     }
-    auto cbegin() const {
+    auto cbegin() const noexcept {
         return coords.cbegin();
     }
-    auto cend() const {
+    auto cend() const noexcept {
         return coords.cend();
     }
-    size_t size() const {
+    size_t size() const noexcept {
         return coords.size();
     }
-    bool empty() const {
+    bool empty() const noexcept {
         return coords.empty();
     }
-    operator std::vector<double>() const {
+    operator std::vector<double>() const noexcept {
         return coords;
     }
     void resize(size_t d) {coords.resize(d);}
@@ -154,7 +155,7 @@ public:
         for (int i=0; i<dimensionality; i++) res += pow(coords[i] - rhs[i], 2);
         return res;
     }
-    double dist(std::vector<double> const& rhs) const {
+    double dist(std::vector<double> const& rhs) const{
         return sqrt(dist2(rhs));
     }
 };
