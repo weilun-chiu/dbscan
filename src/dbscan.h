@@ -15,8 +15,8 @@ public:
     void run(std::string filename);
     void run(std::vector<std::vector<double>>);
 protected:
-    double eps;
-    int minPts;
+    const double eps;
+    const int minPts;
     virtual std::vector<Point> preprocess(std::vector<Point> const& vp) = 0;
     virtual std::vector<int> dbscan_algorithm(std::vector<Point> const& points) = 0;
 };
@@ -105,7 +105,7 @@ protected:
     int clusterIdx;
     int npoints;
     UnionFind uf;
-    std::string className;
+    const std::string className;
     void assignPoints(std::vector<Point> const& points);
     void mark_ingrid_corecell();
     void mark_outgrid_corecell();
