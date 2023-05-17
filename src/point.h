@@ -36,6 +36,12 @@ public:
     auto end() const {
         return coords.end();
     }
+    auto cbegin() const {
+        return coords.cbegin();
+    }
+    auto cend() const {
+        return coords.cend();
+    }
     size_t size() const {
         return coords.size();
     }
