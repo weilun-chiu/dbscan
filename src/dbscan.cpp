@@ -22,7 +22,7 @@
 
 #include <omp.h>
 
-bool anyDistWithinEps(__m256d lhs_x, __m256d lhs_y, __m256d rhs_x, __m256d rhs_y, __m256d eps_AVX) {
+static bool anyDistWithinEps(__m256d lhs_x, __m256d lhs_y, __m256d rhs_x, __m256d rhs_y, __m256d eps_AVX) {
     __m256d diff_x = _mm256_sub_pd(lhs_x, rhs_x);
     __m256d diff_y = _mm256_sub_pd(lhs_y, rhs_y);
     __m256d sqr_x = _mm256_mul_pd(diff_x, diff_x);
@@ -37,7 +37,7 @@ bool anyDistWithinEps(__m256d lhs_x, __m256d lhs_y, __m256d rhs_x, __m256d rhs_y
     return false;
 }
 
-bool isConnect_AVX(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
+static bool isConnect_AVX(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
     // Only support first 2 dimension
 
     while ((rhs.size() % 4 )!= 0) {
@@ -103,7 +103,7 @@ std::vector<int> getGridSize(std::vector<double> const& max_values, std::vector<
     return gridSize;
 }
 
-int kDTo1DIdx(std::vector<int> const& index, std::vector<int> const& gridSize) {
+static int kDTo1DIdx(std::vector<int> const& index, std::vector<int> const& gridSize) {
     int k = index.size();
     int Idx1D = index[0];
     int stride = 1;
@@ -114,7 +114,7 @@ int kDTo1DIdx(std::vector<int> const& index, std::vector<int> const& gridSize) {
     return Idx1D;
 }
 
-std::vector<int> oneDToKDIdx(int index, std::vector<int> const& gridSize) {
+static std::vector<int> oneDToKDIdx(int index, std::vector<int> const& gridSize) {
     std::vector<int> kDIdx(gridSize.size(), 0);
     int k = gridSize.size();
     for (int i = k - 1; i >= 0; i--) {
@@ -124,7 +124,7 @@ std::vector<int> oneDToKDIdx(int index, std::vector<int> const& gridSize) {
     return kDIdx;
 }
 
-std::vector<int> getNeighborIndices(std::vector<int> const& index, std::vector<int> const& gridSize) {
+static std::vector<int> getNeighborIndices(std::vector<int> const& index, std::vector<int> const& gridSize) {
     std::vector<int> res{};
     if (Point::dimensionality == 1) {
         res = {index[0]-1, index[0]+1};
@@ -140,7 +140,7 @@ std::vector<int> getNeighborIndices(std::vector<int> const& index, std::vector<i
     return res;
 }
 
-bool isConnect(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
+static bool isConnect(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
     for (const auto& lhsp: lhs)
         for(const auto& rhsp: rhs)
             if (dist(lhsp, rhsp) <= eps)
@@ -148,7 +148,7 @@ bool isConnect(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
     return false;
 }
 
-int getConnectCount(Point lhsp, std::vector<Point> rhs, double eps) {
+static int getConnectCount(Point lhsp, std::vector<Point> rhs, double eps) {
     int numConn{0};
     for(const auto& rhsp: rhs)
         if (dist(lhsp, rhsp) <= eps)
