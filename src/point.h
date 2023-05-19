@@ -19,9 +19,9 @@ public:
     static size_t dimensionality;
     // CTORs
     Point(int _label, std::vector<double> const& vd, int _id = -1): label{_label}, id{_id}, cluster_label{-1}, coords{vd} {
-        if (dimensionality == 0) {
+        if (dimensionality == 0) [[unlikely]] {
             dimensionality = coords.size();
-        } else if (dimensionality != coords.size()) {
+        } else if (dimensionality != coords.size()) [[likely]] {
             throw std::invalid_argument("Invalid dimensionality.");
         }
     };
