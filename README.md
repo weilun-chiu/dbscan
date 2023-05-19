@@ -186,3 +186,6 @@ We welcome contributions to this project! If you would like to contribute, pleas
     - We plan to develop the KDTree in another repository. As a result, we remove the original kdtree files.
     - Add const.
     - Add noexcept.
+- 5/18/2023:
+    - Add internal linkage in dbscan implementation for performance optimization.
+    - Add `[[Likely]]` and `[[unlikely]]` on Point constructor for performanze optimization.
