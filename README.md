@@ -173,10 +173,7 @@ In summary, we were able to achieve a remarkable 12.79x improvement in runtime t
 
 ## Futureworks
 
-One of the main drawbacks of DBSCAN in high dimensional space is the "curse of dimensionality." As the number of dimensions increases, the distance between points tends to become more uniform, and the density-based approach used by DBSCAN becomes less effective.  To overcome these limitations, KDTree can be used as an alternative approach to improve the performance of DBSCAN in high dimensional space. KDTree is a data structure that partitions data points into a tree structure based on their spatial proximity. This allows for efficient nearest neighbor searches, which are essential for density-based clustering algorithms like DBSCAN.
-
-- [ ] **KDtree Optimization**: Implement KDtree optimization to further improve search time and benchmark its performance.
-- [ ] **Parallel KDtree**: Parallelize the building and searching of the KDtree to further speed up computation and benchmark its performance.
+A significant hurdle faced by DBSCAN in high dimensional spaces is known as the "curse of dimensionality." This phenomenon occurs when the increasing number of dimensions causes the difference in distances between data points to become more uniform, thereby reducing the effectiveness of DBSCAN's density-based methodology. To address these constraints, utilizing data structures such as KDTree/BallTree may enhance DBSCAN's performance within high dimensional spaces. These structures partition data into a tree-like format, depending on their spatial closeness, which optimizes nearest neighbor searches - a critical component for density-based clustering algorithms like DBSCAN.
 
 ## Contributing
 
