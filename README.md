@@ -2,6 +2,8 @@
 
 This project provides an optimized implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN) algorithm in C++. DBSCAN is a popular unsupervised machine learning algorithm used for clustering and outlier detection. The project includes a naive approach and a grid-based approach, and utilizes parallelism to improve the algorithm's performance.
 
+Please be aware that at the Pittsburgh Supercomputing Center (PSC), we are limited to using C++14. However, I made an effort to incorporate modern C++ best practices as much as possible.
+
 ## Table of Contents
 
 - [Introduction](#introduction)
