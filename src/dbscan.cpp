@@ -22,6 +22,7 @@
 
 #include <omp.h>
 
+// Internal
 static bool anyDistWithinEps(__m256d lhs_x, __m256d lhs_y, __m256d rhs_x, __m256d rhs_y, __m256d eps_AVX) {
     __m256d diff_x = _mm256_sub_pd(lhs_x, rhs_x);
     __m256d diff_y = _mm256_sub_pd(lhs_y, rhs_y);
@@ -37,13 +38,15 @@ static bool anyDistWithinEps(__m256d lhs_x, __m256d lhs_y, __m256d rhs_x, __m256
     return false;
 }
 
-static bool isConnect_AVX(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
-    // Only support first 2 dimension
-
-    while ((rhs.size() % 4 )!= 0) {
-        Point copyPoint{rhs[rhs.size()-1]};
-        rhs.push_back(copyPoint);
+static void alignAVXbuffer(std::vector<Point> & vp) {   
+    while ((vp.size() % 4 )!= 0) {
+        Point copyPoint{vp[vp.size()-1]};
+        vp.push_back(copyPoint);
     }
+}
+
+static bool isConnect_AVX(std::vector<Point> const& lhs, std::vector<Point> const& rhs, double eps) {
+    // Only support first 2 dimension
 
     __m256d eps_AVX = _mm256_set1_pd(eps);
     for (const auto& lhsp: lhs) {
@@ -569,6 +572,7 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells, in
         uf.find(cell_index);
         std::vector<int> neighbors = findNeighbor(cell_index);
         for (auto neighbor_index : neighbors) {
+            alignAVXbuffer(grid[neighbor_index]);
             if (isConnect_AVX(grid[cell_index], grid[neighbor_index], eps)) {
                 if (cell_index > neighbor_index) {
                     uf.unite(cell_index, neighbor_index);
@@ -589,6 +593,7 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells, in
         uf.find(cell_index);
         std::vector<int> neighbors = findNeighbor(cell_index);
         for (auto neighbor_index : neighbors) {
+            alignAVXbuffer(grid[neighbor_index]);
             if (isConnect_AVX(grid[cell_index], grid[neighbor_index], eps)) {
                 if (cell_index > neighbor_index) {
                     uf.unite(cell_index, neighbor_index);
