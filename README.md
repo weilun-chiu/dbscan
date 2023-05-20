@@ -11,6 +11,7 @@ This project provides an optimized implementation of the Density-Based Spatial C
 - [Parallelism](#Parallelism)
 - [Futureworks](#Futureworks)
 - [Contributing](#contributing)
+- [Log](#Log)
 
 ## Introduction
 
