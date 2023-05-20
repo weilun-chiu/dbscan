@@ -2,8 +2,6 @@
 
 This project provides an optimized implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN) algorithm in C++. DBSCAN is a popular unsupervised machine learning algorithm used for clustering and outlier detection. The project includes a naive approach and a grid-based approach, and utilizes parallelism to improve the algorithm's performance.
 
-Please be aware that at the Pittsburgh Supercomputing Center (PSC), we are limited to using C++14. However, I made an effort to incorporate modern C++ best practices as much as possible.
-
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -176,6 +174,10 @@ In summary, we were able to achieve a remarkable 12.79x improvement in runtime t
 ## Futureworks
 
 A significant hurdle faced by DBSCAN in high dimensional spaces is known as the "curse of dimensionality." This phenomenon occurs when the increasing number of dimensions causes the difference in distances between data points to become more uniform, thereby reducing the effectiveness of DBSCAN's density-based methodology. To address these constraints, utilizing data structures such as KDTree/BallTree may enhance DBSCAN's performance within high dimensional spaces. These structures partition data into a tree-like format, depending on their spatial closeness, which optimizes nearest neighbor searches - a critical component for density-based clustering algorithms like DBSCAN.
+
+Please be aware that at the Pittsburgh Supercomputing Center (PSC), we are limited to using C++14. However, I made an effort to incorporate modern C++ best practices as much as possible. I list the 
+ - Use `std::string_view` instead of `std::string` (`C++17`)
+ - Use `std::ranges` and `std::spans`
 
 ## Contributing
 
