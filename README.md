@@ -184,6 +184,7 @@ Please be aware that at the Pittsburgh Supercomputing Center (PSC), we are limit
 We welcome contributions to this project! If you would like to contribute, please submit a pull request with your changes.
 
 ## Log
+- Environment: Pittsburgh Supercomputing Center(PSC), dual AMD EPYC 7742 64-Core Processor, C++14
 - 5/16/2023:
     - We plan to develop the KDTree in another repository. As a result, we remove the original kdtree files.
     - Add const.
