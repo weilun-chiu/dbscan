@@ -197,3 +197,7 @@ We welcome contributions to this project! If you would like to contribute, pleas
     - Review pure function in dbscan implementation.
     - Optimize the AVX implementation, remove unneccessary copy in dbscan implementation.
     - Mark the pure functions with `[[gnu::const]]` and `[[gnu::pure]]`.
+- 5/20/2023:
+    - Refactor the AVX2 interface to accept the iterators instead of vector for better generailization. Observed slight speed up.
+    - Refactor to avoid the allocation in loops.
+    - Refactor to apply const on runtime invariant variables.
