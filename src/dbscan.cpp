@@ -14,13 +14,11 @@
 #include <future>
 #include <deque>
 #include <immintrin.h>
-
-
 #include "utils.h"
 #include "point.h"
 #include "dbscan.h"
-
 #include <omp.h>
+
 
 [[gnu::const]] static bool anyDistWithinEps(__m256d lhs_x, __m256d lhs_y, __m256d rhs_x, __m256d rhs_y, __m256d eps_AVX) {
     __m256d diff_x = _mm256_sub_pd(lhs_x, rhs_x);
@@ -37,6 +35,9 @@
     return false;
 }
 
+
+// Modifies the input vector to ensure its size is a multiple of 4.
+// This is beneficial for using AVX operations, which work best with 4-wide vectors.
 static void alignAVXbuffer(std::vector<Point> & vp) {   
     while ((vp.size() % 4 )!= 0) {
         Point copyPoint{vp[vp.size()-1]};
@@ -44,16 +45,18 @@ static void alignAVXbuffer(std::vector<Point> & vp) {
     }
 }
 
-[[gnu::const]] static bool isConnect_AVX(std::vector<Point> const& lhs, std::vector<Point> const& rhs, double eps) {
+
+template <typename Iterator1, typename Iterator2>
+[[gnu::const]] static bool isConnect_AVX(Iterator1 lhs_begin, Iterator1 lhs_end, Iterator2 rhs_begin, Iterator2 rhs_end, double eps) {
     // Only support first 2 dimension
 
     __m256d eps_AVX = _mm256_set1_pd(eps);
-    for (const auto& lhsp: lhs) {
-        __m256d lhs_x = _mm256_set1_pd(lhsp[0]);
-        __m256d lhs_y = _mm256_set1_pd(lhsp[1]);
-        for (int i = 0; i < rhs.size(); i+=4) {
-            __m256d rhs_x = _mm256_set_pd(rhs[i + 3][0], rhs[i + 2][0], rhs[i + 1][0], rhs[i][0]);
-            __m256d rhs_y = _mm256_set_pd(rhs[i + 3][1], rhs[i + 2][1], rhs[i + 1][1], rhs[i][1]);
+    for (auto lhs_it = lhs_begin; lhs_it != lhs_end; ++lhs_it) {
+        __m256d lhs_x = _mm256_set1_pd((*lhs_it)[0]);
+        __m256d lhs_y = _mm256_set1_pd((*lhs_it)[1]);
+        for (auto rhs_it = rhs_begin; rhs_it < rhs_end; rhs_it += 4) {
+            __m256d rhs_x = _mm256_set_pd((*std::next(rhs_it, 3))[0], (*std::next(rhs_it, 2))[0], (*std::next(rhs_it, 1))[0], (*rhs_it)[0]);
+            __m256d rhs_y = _mm256_set_pd((*std::next(rhs_it, 3))[1], (*std::next(rhs_it, 2))[1], (*std::next(rhs_it, 1))[1], (*rhs_it)[1]);
             if (anyDistWithinEps(lhs_x, lhs_y, rhs_x, rhs_y, eps_AVX))
                 return true;
         }
@@ -572,7 +575,8 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells, in
         std::vector<int> neighbors = findNeighbor(cell_index);
         for (auto neighbor_index : neighbors) {
             alignAVXbuffer(grid[neighbor_index]);
-            if (isConnect_AVX(grid[cell_index], grid[neighbor_index], eps)) {
+            if (isConnect_AVX(grid[cell_index].begin(), grid[cell_index].end(),
+                              grid[neighbor_index].begin(), grid[neighbor_index].end(), eps)) {
                 if (cell_index > neighbor_index) {
                     uf.unite(cell_index, neighbor_index);
                 }
@@ -593,7 +597,8 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells, in
         std::vector<int> neighbors = findNeighbor(cell_index);
         for (auto neighbor_index : neighbors) {
             alignAVXbuffer(grid[neighbor_index]);
-            if (isConnect_AVX(grid[cell_index], grid[neighbor_index], eps)) {
+            if (isConnect_AVX(grid[cell_index].begin(), grid[cell_index].end(),
+                              grid[neighbor_index].begin(), grid[neighbor_index].end(), eps)) {
                 if (cell_index > neighbor_index) {
                     uf.unite(cell_index, neighbor_index);
                 }
