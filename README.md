@@ -165,7 +165,7 @@ In our previous section, we discovered that the primary performance bottleneck i
 | 78	 | 	15.292 (3.88)| 	15.482 (3.83) 				 |	1.721 (34.44)					|
 
 
-![alt text](https://i.imgur.com/0Ogmi3Y.png "Comparison between tasked-based OpenMP, C++ Concurrency API with work-stealing, and C++ Concurrency API with work-stealing and AVX instructions. vertical axis is execution time, horizon axis it number of threads.")
+![alt text](https://i.imgur.com/QTNiIJU.png "Comparison between tasked-based OpenMP, C++ Concurrency API with work-stealing, and C++ Concurrency API with work-stealing and AVX instructions. vertical axis is execution time, horizon axis it number of threads.")
 
 ### Conclusion
 In summary, we were able to achieve a remarkable 12.79x improvement in runtime through our implementation of parallelism techniques, which involved identifying and optimizing performance hotspots that accounted for 99% of the total runtime. Our approach included profiling the runtime, using OpenMP for initial parallelism performance, and optimizing further with the C++ Concurrency API and work-stealing mechanism. Additionally, we explored the use of SIMD and AVX instructions to further accelerate the most critical floating-point arithmetic functions, which led to significant performance gains of up to 16.27x on a single thread, 8.69x on 8 threads, and 35.89x compared to the serial program.
