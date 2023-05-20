@@ -193,3 +193,4 @@ We welcome contributions to this project! If you would like to contribute, pleas
     - Add more `[[Likely]]` and `[[unlikely]]` to corner branches in Point header.
     - Review pure function in dbscan implementation.
     - Optimize the AVX implementation, remove unneccessary copy in dbscan implementation.
+    - Mark the pure functions with `[[gnu::const]]` and `[[gnu::pure]]`.
