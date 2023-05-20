@@ -22,8 +22,7 @@
 
 #include <omp.h>
 
-// Internal
-static bool anyDistWithinEps(__m256d lhs_x, __m256d lhs_y, __m256d rhs_x, __m256d rhs_y, __m256d eps_AVX) {
+[[gnu::const]] static bool anyDistWithinEps(__m256d lhs_x, __m256d lhs_y, __m256d rhs_x, __m256d rhs_y, __m256d eps_AVX) {
     __m256d diff_x = _mm256_sub_pd(lhs_x, rhs_x);
     __m256d diff_y = _mm256_sub_pd(lhs_y, rhs_y);
     __m256d sqr_x = _mm256_mul_pd(diff_x, diff_x);
@@ -45,7 +44,7 @@ static void alignAVXbuffer(std::vector<Point> & vp) {
     }
 }
 
-static bool isConnect_AVX(std::vector<Point> const& lhs, std::vector<Point> const& rhs, double eps) {
+[[gnu::const]] static bool isConnect_AVX(std::vector<Point> const& lhs, std::vector<Point> const& rhs, double eps) {
     // Only support first 2 dimension
 
     __m256d eps_AVX = _mm256_set1_pd(eps);
@@ -98,7 +97,7 @@ std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> const& points)
     return cluster;
 }
 
-std::vector<int> getGridSize(std::vector<double> const& max_values, std::vector<double> const& min_values, double gridCellSize) {
+[[gnu::const]] std::vector<int> getGridSize(std::vector<double> const& max_values, std::vector<double> const& min_values, double gridCellSize) {
     std::vector<int> gridSize(max_values.size());
     for (int i = 0; i < max_values.size(); i++) {
         gridSize[i] = static_cast<int>(std::ceil((max_values[i] - min_values[i]) / gridCellSize));
@@ -106,7 +105,7 @@ std::vector<int> getGridSize(std::vector<double> const& max_values, std::vector<
     return gridSize;
 }
 
-static int kDTo1DIdx(std::vector<int> const& index, std::vector<int> const& gridSize) {
+[[gnu::const]] static int kDTo1DIdx(std::vector<int> const& index, std::vector<int> const& gridSize) {
     int k = index.size();
     int Idx1D = index[0];
     int stride = 1;
@@ -117,7 +116,7 @@ static int kDTo1DIdx(std::vector<int> const& index, std::vector<int> const& grid
     return Idx1D;
 }
 
-static std::vector<int> oneDToKDIdx(int index, std::vector<int> const& gridSize) {
+[[gnu::const]] static std::vector<int> oneDToKDIdx(int index, std::vector<int> const& gridSize) {
     std::vector<int> kDIdx(gridSize.size(), 0);
     int k = gridSize.size();
     for (int i = k - 1; i >= 0; i--) {
@@ -127,7 +126,7 @@ static std::vector<int> oneDToKDIdx(int index, std::vector<int> const& gridSize)
     return kDIdx;
 }
 
-static std::vector<int> getNeighborIndices(std::vector<int> const& index, std::vector<int> const& gridSize) {
+[[gnu::pure]] static std::vector<int> getNeighborIndices(std::vector<int> const& index, std::vector<int> const& gridSize) {
     std::vector<int> res{};
     if (Point::dimensionality == 1) {
         res = {index[0]-1, index[0]+1};
@@ -143,7 +142,7 @@ static std::vector<int> getNeighborIndices(std::vector<int> const& index, std::v
     return res;
 }
 
-static bool isConnect(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
+[[gnu::const]] static bool isConnect(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
     for (const auto& lhsp: lhs)
         for(const auto& rhsp: rhs)
             if (dist(lhsp, rhsp) <= eps)
@@ -151,7 +150,7 @@ static bool isConnect(std::vector<Point> lhs, std::vector<Point> rhs, double eps
     return false;
 }
 
-static int getConnectCount(Point lhsp, std::vector<Point> rhs, double eps) {
+[[gnu::const]] static int getConnectCount(Point lhsp, std::vector<Point> rhs, double eps) {
     int numConn{0};
     for(const auto& rhsp: rhs)
         if (dist(lhsp, rhsp) <= eps)
