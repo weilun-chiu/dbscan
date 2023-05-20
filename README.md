@@ -189,3 +189,7 @@ We welcome contributions to this project! If you would like to contribute, pleas
 - 5/18/2023:
     - Add internal linkage in dbscan implementation for performance optimization.
     - Add `[[Likely]]` and `[[unlikely]]` on Point constructor for performanze optimization.
+- 5/19/2023:
+    - Add more `[[Likely]]` and `[[unlikely]]` to corner branches in Point header.
+    - Review pure function in dbscan implementation.
+    - Optimize the AVX implementation, remove unneccessary copy in dbscan implementation.
