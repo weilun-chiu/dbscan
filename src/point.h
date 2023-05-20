@@ -68,7 +68,7 @@ public:
     Point& operator/=(std::vector<double> const& rhs) {
         for (int i = 0; i < dimensionality; i++) {
             double div = rhs[i];
-            if (div == 0) {
+            if (div == 0) [[unlikely]] {
                 div = divbyzero;
             }
             coords[i] /= div;
@@ -96,7 +96,7 @@ public:
     Point& operator/=(double rhs) {
         for (int i = 0; i < dimensionality; i++) {
             double div = rhs;
-            if (div == 0) {
+            if (div == 0) [[unlikely]] {
                 div = divbyzero;
             }
             coords[i] /= div;
@@ -124,7 +124,7 @@ public:
     }
     bool operator==(std::vector<double> const& rhs) const{
         for (int i=0; i<dimensionality; i++)
-            if (coords[i] != rhs[i])
+            if (coords[i] != rhs[i]) [[likely]]
                 return false;
         return true;
     }
@@ -132,7 +132,7 @@ public:
         return !(*this == rhs);
     }
     bool operator<(std::vector<double> const& rhs) const {
-        if (dimensionality != rhs.size()) {
+        if (dimensionality != rhs.size()) [[unlikely]] {
             throw std::invalid_argument("Vectors must be of same size");
         }
         for (int i = 0; i < dimensionality; i++) {
