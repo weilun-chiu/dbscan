@@ -306,9 +306,9 @@ std::vector<int> GridDBSCAN::findNeighbor(int i) {
 bool GridDBSCAN::mark_outgrid_corecell_helper(int i) {
     const std::vector<int> neighbors=findNeighbor(i);
     int numConn{0};
-    for (const auto& g: grid[i]) {
+    for (auto const& g: grid[i]) {
         numConn=0;
-        for (const auto& nid: neighbors) {
+        for (auto const& nid: neighbors) {
             numConn += getConnectCount(g, grid[nid], eps);
             if (numConn >= minPts) {
                 corecell_set.push_back(i);
@@ -328,7 +328,7 @@ void GridDBSCAN::_expand_helper(int i) {
         node = q.front();
         q.pop();
         neighbors=findNeighbor(node);
-        for (auto& ni:neighbors) {
+        for (auto const& ni:neighbors) {
             if (visited[ni] == true) continue;
             if (isConnect(grid[i], grid[ni], eps)) {
                 visited[ni] = true;
@@ -343,7 +343,7 @@ void GridDBSCAN::_expand_helper(int i) {
 void GridDBSCAN::expand_helper(int i) {
     uf.find(i);
     std::vector<int> neighbors=findNeighbor(i);
-    for (auto& ni:neighbors) {
+    for (auto const& ni:neighbors) {
         if (isConnect(grid[i], grid[ni], eps)) {
             if (i > ni) {
                 uf.unite(i, ni);
@@ -358,7 +358,7 @@ void ConcurrencyGridDBSCAN::expand_helper(int lo, int hi) {
     for (int _i = lo; _i < hi; _i++) {
         i = corecell_set[_i];
         neighbors = findNeighbor(i);
-        for (auto& ni:neighbors) {
+        for (auto const& ni:neighbors) {
             if (isConnect(grid[i], grid[ni], eps)) {
                 if (i > ni) {
                     uf.unite(i, ni);
@@ -383,7 +383,7 @@ void ConcurrencyStealingGridDBSCAN::expand_helper(std::deque<int> *cells, int ti
 
         uf.find(cell_index);
         neighbors = findNeighbor(cell_index);
-        for (auto neighbor_index : neighbors) {
+        for (auto const& neighbor_index : neighbors) {
             if (isConnect(grid[cell_index], grid[neighbor_index], eps)) {
                 if (cell_index > neighbor_index) {
                     uf.unite(cell_index, neighbor_index);
@@ -403,7 +403,7 @@ void ConcurrencyStealingGridDBSCAN::expand_helper(std::deque<int> *cells, int ti
 
         uf.find(cell_index);
         neighbors = findNeighbor(cell_index);
-        for (auto neighbor_index : neighbors) {
+        for (auto const& neighbor_index : neighbors) {
             if (isConnect(grid[cell_index], grid[neighbor_index], eps)) {
                 if (cell_index > neighbor_index) {
                     uf.unite(cell_index, neighbor_index);
@@ -596,7 +596,7 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells, in
 
         uf.find(cell_index);
         neighbors = findNeighbor(cell_index);
-        for (auto neighbor_index : neighbors) {
+        for (auto const& neighbor_index : neighbors) {
             alignAVXbuffer(grid[neighbor_index]);
             if (isConnect_AVX(grid[cell_index].begin(), grid[cell_index].end(),
                               grid[neighbor_index].begin(), grid[neighbor_index].end(), eps)) {
@@ -618,7 +618,7 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells, in
 
         uf.find(cell_index);
         neighbors = findNeighbor(cell_index);
-        for (auto neighbor_index : neighbors) {
+        for (auto const& neighbor_index : neighbors) {
             alignAVXbuffer(grid[neighbor_index]);
             if (isConnect_AVX(grid[cell_index].begin(), grid[cell_index].end(),
                               grid[neighbor_index].begin(), grid[neighbor_index].end(), eps)) {
