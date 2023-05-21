@@ -201,3 +201,4 @@ We welcome contributions to this project! If you would like to contribute, pleas
     - Refactor the AVX2 interface to accept the iterators instead of vector for better generailization. Observed slight speed up.
     - Refactor to avoid the allocation in loops.
     - Refactor to apply const on runtime invariant variables.
+    - Refactor to avoid copy in range for.
