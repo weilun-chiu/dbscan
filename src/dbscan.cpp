@@ -29,10 +29,7 @@
     const __m256d dist_squared = _mm256_sqrt_pd(sum);
     const __m256d cmp_result = _mm256_cmp_pd(dist_squared, eps_AVX, _CMP_LT_OS);
     const int mask = _mm256_movemask_pd(cmp_result);
-    if (mask != 0) {
-        return true;
-    }
-    return false;
+    return mask != 0;
 }
 
 
@@ -155,19 +152,17 @@ std::vector<int> NaiveDBSCAN::dbscan_algorithm(std::vector<Point> const& points)
 }
 
 [[gnu::const]] static bool isConnect(std::vector<Point> lhs, std::vector<Point> rhs, double eps) {
-    for (const auto& lhsp: lhs)
-        for(const auto& rhsp: rhs)
+    for (auto const& lhsp: lhs)
+        for(auto const& rhsp: rhs)
             if (dist(lhsp, rhsp) <= eps)
                 return true;
     return false;
 }
 
-[[gnu::const]] static int getConnectCount(Point lhsp, std::vector<Point> rhs, double eps) {
-    int numConn{0};
-    for(const auto& rhsp: rhs)
-        if (dist(lhsp, rhsp) <= eps)
-            numConn++;
-    return numConn;
+[[gnu::const]] static int getConnectCount(Point lhsp, std::vector<Point> const& rhs, double eps) {
+    return std::count_if(rhs.begin(), rhs.end(), [&](Point const& rhsp) {
+        return dist(lhsp, rhsp) <= eps;
+    });
 }
 
 GridDBSCAN::GridDBSCAN(double _eps, int _minPts, std::string _className)
@@ -182,7 +177,7 @@ void GridDBSCAN::assignPoints(std::vector<Point> const& points) {
     std::vector<int> index(Point::dimensionality);
     int GridIndex1D{};
     const double _gridCellSize = gridCellSize;
-    for (const auto& p : points) {
+    for (auto const& p : points) {
         std::transform(p.begin(), p.end(), index.begin(), [_gridCellSize](double x) {
             return static_cast<int>(x / _gridCellSize);
         });
@@ -203,7 +198,6 @@ void GridDBSCAN::mark_ingrid_corecell() {
 void GridDBSCAN::mark_outgrid_corecell() {
     for (int i = 0; i<gridSize1D; i++) {
         if (corecell[i] == true) continue;
-        if (grid[i].size() == 0) continue;
         if (grid[i].size() > 0)
             corecell[i] = mark_outgrid_corecell_helper(i);
     }
@@ -238,15 +232,13 @@ void ConcurrencyGridDBSCAN::expand() {
 
     int start{0};
 
-    for (int _i = 0; _i < num_threads; _i++) {
-        using helper_func_t = void (ConcurrencyGridDBSCAN::*)(int, int);
-        helper_func_t helper_func_ptr = &ConcurrencyGridDBSCAN::expand_helper;
-        if (_i != num_threads-1)
-            futures.push_back(std::async(std::launch::async, helper_func_ptr, this, start, start+blockSize));
-        else
-            futures.push_back(std::async(std::launch::async, helper_func_ptr, this, start, last));
+    using helper_func_t = void (ConcurrencyGridDBSCAN::*)(int, int);
+    helper_func_t helper_func_ptr = &ConcurrencyGridDBSCAN::expand_helper;
+    for (int _i = 0; _i < num_threads-1; _i++) {
+        futures.push_back(std::async(std::launch::async, helper_func_ptr, this, start, start+blockSize));
         start += blockSize;
     }
+    futures.push_back(std::async(std::launch::async, helper_func_ptr, this, start, last));
 
     for (auto &future : futures) {
         future.wait();
@@ -273,9 +265,9 @@ void ConcurrencyStealingGridDBSCAN::expand() {
         tasks.pop_front();
     }
 
+    using helper_func_t = void (ConcurrencyStealingGridDBSCAN::*)(std::deque<int>*, int, std::deque<int>*, int);
+    helper_func_t helper_func_ptr = &ConcurrencyStealingGridDBSCAN::expand_helper;
     for (int i = 0; i < num_threads; i++) {
-        using helper_func_t = void (ConcurrencyStealingGridDBSCAN::*)(std::deque<int>*, int, std::deque<int>*, int);
-        helper_func_t helper_func_ptr = &ConcurrencyStealingGridDBSCAN::expand_helper;
         futures.push_back(std::async(std::launch::async, helper_func_ptr, this, &work[i], i, &work[(i+1)%num_threads], (i+1)%num_threads));
     }
 
@@ -344,10 +336,9 @@ void GridDBSCAN::expand_helper(int i) {
     uf.find(i);
     std::vector<int> neighbors=findNeighbor(i);
     for (auto const& ni:neighbors) {
+        if (i <= ni) continue;
         if (isConnect(grid[i], grid[ni], eps)) {
-            if (i > ni) {
-                uf.unite(i, ni);
-            }
+            uf.unite(i, ni);
         }
     }
 }
@@ -359,10 +350,9 @@ void ConcurrencyGridDBSCAN::expand_helper(int lo, int hi) {
         i = corecell_set[_i];
         neighbors = findNeighbor(i);
         for (auto const& ni:neighbors) {
+            if (i <= ni) continue;
             if (isConnect(grid[i], grid[ni], eps)) {
-                if (i > ni) {
-                    uf.unite(i, ni);
-                }
+                uf.unite(i, ni);
             }
         }
     }
@@ -384,10 +374,9 @@ void ConcurrencyStealingGridDBSCAN::expand_helper(std::deque<int> *cells, int ti
         uf.find(cell_index);
         neighbors = findNeighbor(cell_index);
         for (auto const& neighbor_index : neighbors) {
+            if (cell_index <= neighbor_index) continue;
             if (isConnect(grid[cell_index], grid[neighbor_index], eps)) {
-                if (cell_index > neighbor_index) {
-                    uf.unite(cell_index, neighbor_index);
-                }
+                uf.unite(cell_index, neighbor_index);
             }
         }
     }
@@ -404,10 +393,9 @@ void ConcurrencyStealingGridDBSCAN::expand_helper(std::deque<int> *cells, int ti
         uf.find(cell_index);
         neighbors = findNeighbor(cell_index);
         for (auto const& neighbor_index : neighbors) {
+            if (cell_index <= neighbor_index) continue;
             if (isConnect(grid[cell_index], grid[neighbor_index], eps)) {
-                if (cell_index > neighbor_index) {
-                    uf.unite(cell_index, neighbor_index);
-                }
+                uf.unite(cell_index, neighbor_index);
             }
         }
     }
@@ -415,7 +403,7 @@ void ConcurrencyStealingGridDBSCAN::expand_helper(std::deque<int> *cells, int ti
 
 std::vector<Point> GridDBSCAN::preprocess(std::vector<Point> const& points) {
     gridCellSize = eps / sqrt(Point::dimensionality);
-    const auto [max_values, min_values] = calculateMinMaxValues(points);
+    const auto& [max_values, min_values] = calculateMinMaxValues(points);
     gridSize = getGridSize(max_values, min_values, gridCellSize);
     gridSize1D = std::accumulate(gridSize.begin(), gridSize.end(), 1, std::multiplies<int>());
     grid.resize(gridSize1D);
@@ -488,7 +476,7 @@ void print_clusters(std::vector<Point> const& points, std::vector<int> const& cl
 }
 
 void calculateAccuracy(std::vector<Point> const& points, std::vector<int> const& cluster) {
-    if (points.size() != cluster.size()) {
+    if (points.size() != cluster.size()) [[unlikely]] {
         std::cout << "Unmatched size\n";
         return;
     }
@@ -499,7 +487,7 @@ void calculateAccuracy(std::vector<Point> const& points, std::vector<int> const&
             correct++;
         }
     }
-    if (n <= 0) {
+    if (n <= 0) [[unlikely]] {
         std::cout << "No accuracy data due to 'Div by zero'. Please make sure the input data is not empty.\n" ;
     } else {
         std::cout << "Accuracy: " << static_cast<double>(correct)/n << "\n";
@@ -597,12 +585,11 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells, in
         uf.find(cell_index);
         neighbors = findNeighbor(cell_index);
         for (auto const& neighbor_index : neighbors) {
+            if (cell_index <= neighbor_index) continue;
             alignAVXbuffer(grid[neighbor_index]);
             if (isConnect_AVX(grid[cell_index].begin(), grid[cell_index].end(),
                               grid[neighbor_index].begin(), grid[neighbor_index].end(), eps)) {
-                if (cell_index > neighbor_index) {
-                    uf.unite(cell_index, neighbor_index);
-                }
+                uf.unite(cell_index, neighbor_index);\
             }
         }
     }
@@ -619,12 +606,11 @@ void ConcurrencyStealingAVX2GridDBSCAN::expand_helper(std::deque<int> *cells, in
         uf.find(cell_index);
         neighbors = findNeighbor(cell_index);
         for (auto const& neighbor_index : neighbors) {
+            if (cell_index <= neighbor_index) continue;
             alignAVXbuffer(grid[neighbor_index]);
             if (isConnect_AVX(grid[cell_index].begin(), grid[cell_index].end(),
                               grid[neighbor_index].begin(), grid[neighbor_index].end(), eps)) {
-                if (cell_index > neighbor_index) {
-                    uf.unite(cell_index, neighbor_index);
-                }
+                uf.unite(cell_index, neighbor_index);
             }
         }
     }
