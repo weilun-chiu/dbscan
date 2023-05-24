@@ -28,6 +28,13 @@ To make use of this project, you can add the DBSCAN header file #include "dbscan
 * ConcurrencyStealingGridDBSCAN
 * ConcurrencyStealingAVX2GridDBSCAN
 
+To build
+```
+cd build
+cmake ..
+make
+```
+
 ## Example
 
 The `main.cpp` file serves as the primary example of usage, while the `test.cpp` file exhibits the results of the unit tests.
