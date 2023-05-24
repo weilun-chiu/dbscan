@@ -210,3 +210,5 @@ We welcome contributions to this project! If you would like to contribute, pleas
     - Refactor to apply const on runtime invariant variables.
     - Refactor to avoid copy in range for.
     - Refactor to remove unnecessary branches and optimize control flow.
+- 5/23/2023:
+    - Replaced original `Makefile` with CMake.
